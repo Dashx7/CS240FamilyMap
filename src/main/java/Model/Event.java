@@ -1,25 +1,41 @@
 package Model;
 
+import java.util.Objects;
+
 /**
  * This contains all the details for a single event
  */
 public class Event {
     private String eventID;
     private String associatedUsername;
-    private String firstName;
-    private String lastName;
-    private char gender;
-    private String fatherID;
-    private String motherID;
-    private String spouseID;
+    private String personID;
+    private float latitude;
+    private float longitude;
+
+    private String country;
+    private String city;
+    private String eventType;
+    private int year;
 
 
     /**
      * The wonderful default constructor
      */
     public Event(){
-
     }
+
+    public Event(String eventID, String associatedUsername, String personID, float latitude, float longitude, String country, String city, String eventType,  int year) {
+        this.eventID = eventID;
+        this.associatedUsername = associatedUsername;
+        this.personID = personID;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.year = year;
+        this.country = country;
+        this.city = city;
+        this.eventType = eventType;
+    }
+
     public String getEventID() {
         return eventID;
     }
@@ -36,51 +52,72 @@ public class Event {
         this.associatedUsername = associatedUsername;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getPersonID() {
+        return personID;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setPersonID(String personID) {
+        this.personID = personID;
     }
 
-    public String getLastName() {
-        return lastName;
+    public float getLatitude() {
+        return latitude;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setLatitude(float latitude) {
+        this.latitude = latitude;
     }
 
-    public String getFatherID() {
-        return fatherID;
+    public float getLongitude() {
+        return longitude;
     }
 
-    public void setFatherID(String fatherID) {
-        this.fatherID = fatherID;
+    public void setLongitude(float longitude) {
+        this.longitude = longitude;
     }
 
-    public String getMotherID() {
-        return motherID;
+    public int getYear() {
+        return year;
     }
 
-    public void setMotherID(String motherID) {
-        this.motherID = motherID;
+    public void setYear(int year) {
+        this.year = year;
     }
 
-    public String getSpouseID() {
-        return spouseID;
+    public String getCountry() {
+        return country;
     }
 
-    public void setSpouseID(String spouseID) {
-        this.spouseID = spouseID;
+    public void setCountry(String country) {
+        this.country = country;
     }
 
-    public char getGender() {
-        return gender;
+    public String getCity() {
+        return city;
     }
 
-    public void setGender(char gender) {
-        this.gender = gender;
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Event event = (Event) o;
+        return Float.compare(event.latitude, latitude) == 0 && Float.compare(event.longitude, longitude) == 0 && year == event.year && eventID.equals(event.eventID) && associatedUsername.equals(event.associatedUsername) && personID.equals(event.personID) && country.equals(event.country) && city.equals(event.city) && eventType.equals(event.eventType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(eventID, associatedUsername, personID, latitude, longitude, country, city, eventType, year);
     }
 }
