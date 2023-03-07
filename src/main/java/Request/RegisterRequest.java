@@ -1,28 +1,32 @@
 package Request;
 
+import com.google.gson.Gson;
+
 /**
  * Request to make a new registration
  */
 public class RegisterRequest {
-    String requestBody;
+    //Variables from the Json request
+    //String requestBody;
+    String username;
+    String password;
+    String email;
+    String firstName;
+    String lastName;
+    String gender; //Will be either f or m
+
     /**
      * The wonderful default constructor
      */
     public RegisterRequest(){
     }
-
-    public String getRequestBody() {
-        return requestBody;
-    }
-
-    public void setRequestBody(String requestBody) {
-        this.requestBody = requestBody;
-    }
-
     /**
-     * request with body
+     * Constructor with request body
      */
     public RegisterRequest(String requestBody){
-        this.requestBody = requestBody;
+        Gson gson = new Gson();
+        gson.fromJson(requestBody,this.getClass());
     }
+
+
 }

@@ -15,11 +15,13 @@ public class LoadResult {
      */
     public LoadResult(){
     }
-    /**
-     * The wonderful non-default constructor
-     * @param myRequest the login request
-     */
-    public LoadResult(LoadRequest myRequest){
+    public void success(int numUsers, int numPersons, int numEvents){
+        setSuccess(true);
+        setMessage("Successfully added " + numUsers + " users, " +
+                numPersons + " persons, and " + numEvents + " events to the database.");
+    }
+    public void failure(String error){
+        setMessage("Error : " + error);
     }
 
     public String getMessage() {

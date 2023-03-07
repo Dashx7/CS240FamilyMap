@@ -15,6 +15,7 @@ public class LoginRequest {
      */
     public LoginRequest(String requestBody){
         this.requestBody = requestBody;
+
     }
 
     public String getRequestBody() {

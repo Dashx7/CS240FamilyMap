@@ -16,27 +16,7 @@ public class EventRequest {
         return singlePerson;
     }
 
-    public void setSinglePerson(boolean singlePerson) {
-        this.singlePerson = singlePerson;
-    }
-
-    public Event getMyEvent() {
-        return myEvent;
-    }
-
-    public void setMyEvent(Event myEvent) {
-        this.myEvent = myEvent;
-    }
-
-
-    public AuthToken getUserAuthToken() {
-        return userAuthToken;
-    }
-
-    public void setUserAuthToken(AuthToken userAuthToken) {
-        this.userAuthToken = userAuthToken;
-    }
-    /**
+   /**
      * The wonderful default constructor
      */
     public EventRequest(){

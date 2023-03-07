@@ -21,15 +21,23 @@ public class ClearResult {
         this.success = success;
     }
 
-    String message;
-    boolean success;
+    String message = "Not initialized";
+    boolean success = false;
     /**
      * The wonderful default constructor
      */
     public ClearResult(){
-        clear();
     }
-    void clear(){
-
+    public void success(){
+        message = "Clear succeeded.";
+        success = true;
+    }
+    public void error(String descriptionOfError){
+        message = descriptionOfError;
+        success = false;
+    }
+    public void error(){
+        message = "Not specified";
+        success = false;
     }
 }

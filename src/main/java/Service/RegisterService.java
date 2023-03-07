@@ -1,5 +1,6 @@
 package Service;
 
+import DataAccess.UserDao;
 import Model.AuthToken;
 import Result.RegisterResult;
 import Request.RegisterRequest;
@@ -8,13 +9,14 @@ import Request.RegisterRequest;
  */
 public class RegisterService {
     AuthToken userToken;
+    RegisterRequest myRequest;
     /**
      * The wonderful default constructor
      */
+    private UserDao myUserDao;
     public RegisterService(){
-        RegisterRequest myRequest = new RegisterRequest();
-        RegisterResult myResult = new RegisterResult(myRequest);
-        userToken = myResult.getUserAuthToken();
+        //myUserDao.insert(myRequest);
+
         LoginService newLogin = new LoginService(); // idk
     }
 

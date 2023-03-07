@@ -8,7 +8,7 @@ import javax.security.sasl.AuthorizeCallback;
  * person request
  */
 public class PersonRequest {
-    AuthToken userAuthToken;
+    //AuthToken userAuthToken;
     boolean isSingular;
 
     public boolean isSingular() {
@@ -17,14 +17,6 @@ public class PersonRequest {
 
     public void setSingular(boolean singular) {
         isSingular = singular;
-    }
-
-    public AuthToken getUserAuthToken() {
-        return userAuthToken;
-    }
-
-    public void setUserAuthToken(AuthToken userAuthToken) {
-        this.userAuthToken = userAuthToken;
     }
 
     /**

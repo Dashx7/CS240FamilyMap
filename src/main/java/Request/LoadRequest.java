@@ -1,13 +1,17 @@
 package Request;
 
 import Model.AuthToken;
+import Model.Event;
+import Model.Person;
+import Model.User;
 
 /**
  * Load request,
  */
 public class LoadRequest {
-    String requestBody;
-
+    User[] users;
+    Person[] persons;
+    Event [] events;
 
     /**
      * The wonderful default constructor
@@ -15,18 +19,27 @@ public class LoadRequest {
     public LoadRequest(){
     }
 
-    public String getRequestBody() {
-        return requestBody;
+    public User[] getUsers() {
+        return users;
     }
 
-    public void setRequestBody(String requestBody) {
-        this.requestBody = requestBody;
+    public void setUsers(User[] users) {
+        this.users = users;
     }
 
-    /**
-     * Load with request body
-     */
-    public LoadRequest(String requestBody){
-        this.requestBody = requestBody;
+    public Person[] getPersons() {
+        return persons;
+    }
+
+    public void setPersons(Person[] persons) {
+        this.persons = persons;
+    }
+
+    public Event[] getEvents() {
+        return events;
+    }
+
+    public void setEvents(Event[] events) {
+        this.events = events;
     }
 }

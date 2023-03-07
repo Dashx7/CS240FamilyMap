@@ -1,6 +1,5 @@
 import java.io.*;
 import java.net.*;
-import java.util.logging.FileHandler;
 
 import Handler.*;
 import com.sun.net.httpserver.*;
@@ -73,25 +72,24 @@ public class Server {
         // forwards the request to the handler for that URL path.
         System.out.println("Creating contexts");
 
-        // Create and install the HTTP handler for the "/games/list" URL path.
-        // When the HttpServer receives an HTTP request containing the
-        // "/games/list" URL path, it will forward the request to ListGamesHandler
-        // for processing.
-
-        server.createContext("/games/list", new ListGamesHandler());
-
-        // Create and install the HTTP handler for the "/routes/claim" URL path.
-        // When the HttpServer receives an HTTP request containing the
-        // "/routes/claim" URL path, it will forward the request to ClaimRouteHandler
-        // for processing.
-        server.createContext("/routes/claim", new ClaimRouteHandler());
-
         // Create and install the "default" (or "file") HTTP handler.
         // All requests that do not match the other handler URLs
         // will be passed to this handle.
         // These are requests to download a file from the server
         // (e.g., web site files)
+
+        //Default context
         server.createContext("/", new FileHandler());
+        //My contexts
+        server.createContext("/clear", new ClearHandler());
+        server.createContext("/event/", new EventHandler());
+        server.createContext("/fill/", new FillHandler());
+        server.createContext("/load", new LoadHandler());
+        server.createContext("/user/login", new LoginHandler());
+        server.createContext("/person", new PersonHandler());
+        server.createContext("/user/register", new RegisterHandler());
+
+
 
         // Log message indicating that the HttpServer is about the start accepting
         // incoming client connections.
