@@ -1,6 +1,6 @@
 package Result;
 
-import Request.PersonRequest;
+//import Request.PersonRequest;
 import Request.RegisterRequest;
 
 /**
@@ -8,7 +8,7 @@ import Request.RegisterRequest;
  */
 public class PersonResult {
 
-    String message;
+    String message; //No message?
     boolean success;
 
     public String getMessage() {
@@ -32,11 +32,9 @@ public class PersonResult {
      */
     public PersonResult(){
     }
-    /**
-     * The wonderful non-default constructor
-     * @param myRequest the PersonRequest
-     */
-    public PersonResult(PersonRequest myRequest){
-
+    public void success(){
+        //setMessage("Success");
+        setSuccess(true);
     }
+
 }

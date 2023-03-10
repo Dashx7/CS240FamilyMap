@@ -15,7 +15,6 @@ import java.sql.Connection;
 //They are pretty much a wrapper class to the DAO allowing you to do requests and get results
 public class ClearService {
     private ClearResult myResults = new ClearResult();
-    ;
     private AuthTokenDao myAuthTokenDao;
     private EventDao myEventDao;
     private PersonDao myPersonDao;

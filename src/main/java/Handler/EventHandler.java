@@ -2,85 +2,112 @@ package Handler;
 
 import java.io.*;
 import java.net.*;
-import Service.ClearService;
-import Result.ClearResult;
+import java.sql.Connection;
 
+import DataAccess.AuthTokenDao;
+import DataAccess.DataAccessException;
+import DataAccess.Database;
+import Model.AuthToken;
+import Model.Event;
+import Service.EventService;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.*;
 
-//tODO
 public class EventHandler implements HttpHandler {
+    String eventID = null;
+    /**
+     *
+     * @param exchange the exchange containing the request from the
+     *                 client and used to send the response
+     */
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         boolean success = false;
-
+        String httpURI = exchange.getRequestURI().toString();
+        String[] parts = httpURI.split("/");
         try {
-            // Determine the HTTP request type (GET, POST, etc.).
-            if (exchange.getRequestMethod().toLowerCase().equals("post")) { //Yep
-
+            // Get request
+            if (exchange.getRequestMethod().equalsIgnoreCase("get")) {
 
                 // Get the HTTP request headers
                 Headers reqHeaders = exchange.getRequestHeaders();
-                // Extract the JSON string from the HTTP request body
+                // Check to see if an "Authorization" header is present
+                if (reqHeaders.containsKey("Authorization")) {
 
-                // Get the request body input stream
-                InputStream reqBody = exchange.getRequestBody();
-
-                // Read JSON string from the input stream
-                String reqData = readString(reqBody);
-
-                // Display/log the request JSON data
-                System.out.println(reqData);
-
-
-                //LoginRequest request = (LoginRequest) gson.fromJson(reqData, LoginRequest.class);
-
-                //Actually Clearing things
-                ClearService service = new ClearService();
-                //Grabs the result of clearing it
-                ClearResult result = service.getMyResults();
-
-                if(result.isSuccess()){
-                    exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
-                    Writer resBody  = new OutputStreamWriter(exchange.getResponseBody());
-                    Gson gson = new Gson();
-                    gson.toJson(result, resBody); //Writes it to the resBody
-                    resBody.close();
-                    //exchange.getResponseBody().close();
-                    success = true;
+                    // Extract the auth token from the "Authorization" header
+                    String authToken = reqHeaders.getFirst("Authorization");
+                    success = handleEvent(exchange, success, parts, authToken);
                 }
-
             }
 
             if (!success) {
-                // The HTTP request was invalid somehow, so we return a "bad request"
-                // status code to the client.
                 exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
-
-                // We are not sending a response body, so close the response body
-                // output stream, indicating that the response is complete.
                 exchange.getResponseBody().close();
             }
+
         } catch (IOException e) {
-            // Some kind of internal error has occurred inside the server (not the
-            // client's fault), so we return an "internal server error" status code
-            // to the client.
             exchange.sendResponseHeaders(HttpURLConnection.HTTP_SERVER_ERROR, 0);
-
-            // We are not sending a response body, so close the response body
-            // output stream, indicating that the response is complete.
             exchange.getResponseBody().close();
-
-            // Display/log the stack trace
             e.printStackTrace();
         }
+    }
+
+    private boolean handleEvent(HttpExchange exchange, boolean success, String[] parts, String authToken) throws IOException {
+        try {
+            //Opening the database
+            Database myDatabase = new Database();
+            myDatabase.openConnection();
+            Connection myConnection = myDatabase.getConnection();
+            AuthTokenDao myAuthTokenDao = new AuthTokenDao(myConnection);
+            AuthToken myAuthtoken = myAuthTokenDao.find(authToken, "authtoken");
+            if (myAuthtoken != null) {
+                int numParts = parts.length;
+                if (numParts == 3) {
+                    eventID = (parts[2]);
+                }
+                if(eventID == null){
+                    handleForAllEvents(exchange, myAuthtoken);
+                }
+                else{
+                    handleForSingularEvent(exchange, myAuthtoken, eventID);
+                }
+                success = true;
+                myDatabase.closeConnection(false);
+            } else {
+                myDatabase.closeConnection(false);
+            }
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        return success;
+    }
+
+    private void handleForAllEvents(HttpExchange exchange, AuthToken myAuthtoken) throws DataAccessException, IOException {
+        EventService myEventService = new EventService();
+        myEventService.EventServiceAll(myAuthtoken);
+        Event[] myEvents = myEventService.getListOfEventsFinal();
+        exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
+        Writer resBody = new OutputStreamWriter(exchange.getResponseBody());
+        Gson gson = new Gson();
+        gson.toJson(myEvents, resBody);
+        resBody.close();
+    }
+
+    private static void handleForSingularEvent(HttpExchange exchange, AuthToken myAuthtoken, String eventID) throws DataAccessException, IOException {
+        EventService myEventService = new EventService();
+        myEventService.EventServiceSingular(myAuthtoken,eventID);
+        Event myEvent = myEventService.getSingularEvent();
+        exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
+        Writer resBody = new OutputStreamWriter(exchange.getResponseBody());
+        Gson gson = new Gson();
+        gson.toJson(myEvent, resBody);
+        resBody.close();
     }
 
     /*
         The readString method shows how to read a String from an InputStream.
     */
     private String readString(InputStream is) throws IOException {
-        //TODO build a string handler
         StringBuilder sb = new StringBuilder();
         InputStreamReader sr = new InputStreamReader(is);
         char[] buf = new char[1024];

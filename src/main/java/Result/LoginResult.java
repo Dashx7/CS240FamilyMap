@@ -1,8 +1,7 @@
 package Result;
 
-import Model.AuthToken;
+import DataAccess.DataAccessException;
 import Request.LoginRequest;
-import Request.RegisterRequest;
 
 /**
  * for login handling result
@@ -10,7 +9,6 @@ import Request.RegisterRequest;
 public class LoginResult {
     String message;
     boolean success;
-    AuthToken userAuthtoken;
     public String getMessage() {
         return message;
     }
@@ -27,12 +25,13 @@ public class LoginResult {
         this.success = success;
     }
 
-    public AuthToken getUserAuthtoken() {
-        return userAuthtoken;
+    public void success(){
+       setMessage("Successfully Logged in");
+       setSuccess(true);
     }
-
-    public void setUserAuthtoken(AuthToken userAuthtoken) {
-        this.userAuthtoken = userAuthtoken;
+    public void fail(DataAccessException e){
+        setMessage("Failed due to :" + e.toString());
+        setSuccess(false);
     }
 
 

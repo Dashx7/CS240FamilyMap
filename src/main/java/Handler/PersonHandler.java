@@ -2,58 +2,36 @@ package Handler;
 
 import java.io.*;
 import java.net.*;
+import java.sql.Connection;
+
+import DataAccess.AuthTokenDao;
+import DataAccess.DataAccessException;
+import DataAccess.Database;
+import DataAccess.PersonDao;
+import Model.AuthToken;
+import Model.Person;
+import Service.PersonService;
+import com.google.gson.Gson;
 import com.sun.net.httpserver.*;
 
-/*
-	The ClaimRouteHandler is the HTTP handler that processes
-	incoming HTTP requests that contain the "/routes/claim" URL path.
-
-	Notice that ClaimRouteHandler implements the HttpHandler interface,
-	which is define by Java.  This interface contains only one method
-	named "handle".  When the HttpServer object (declared in the Server class)
-	receives a request containing the "/routes/claim" URL path, it calls
-	ClaimRouteHandler.handle() which actually processes the request.
-*/
 public class PersonHandler implements HttpHandler {
-
-    // Handles HTTP requests containing the "/routes/claim" URL path.
-    // The "exchange" parameter is an HttpExchange object, which is
-    // defined by Java.
-    // In this context, an "exchange" is an HTTP request/response pair
-    // (i.e., the client and server exchange a request and response).
-    // The HttpExchange object gives the handler access to all of the
-    // details of the HTTP request (Request type [GET or POST],
-    // request headers, request body, etc.).
-    // The HttpExchange object also gives the handler the ability
-    // to construct an HTTP response and send it back to the client
-    // (Status code, headers, response body, etc.).
+    String personID = null;
+    /**
+     *
+     * @param exchange the exchange containing the request from the
+     *                 client and used to send the response
+     * @throws IOException
+     */
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
-        // This handler allows a "Ticket to Ride" player to claim ability
-        // route between two cities (part of the Ticket to Ride game).
-        // The HTTP request body contains a JSON object indicating which
-        // route the caller wants to claim (a route is defined by two cities).
-        // This implementation is clearly unrealistic, because it
-        // doesn't actually do anything other than print out the received JSON string.
-        // It is also unrealistic in that it accepts only one specific
-        // hard-coded auth token.
-        // However, it does demonstrate the following:
-        // 1. How to get the HTTP request type (or, "method")
-        // 2. How to access HTTP request headers
-        // 3. How to read JSON data from the HTTP request body
-        // 4. How to return the desired status code (200, 404, etc.)
-        //		in an HTTP response
-        // 5. How to check an incoming HTTP request for an auth token
-
         boolean success = false;
+        String httpURI = exchange.getRequestURI().toString();
+        String[] parts = httpURI.split("/");
 
         try {
-            // Determine the HTTP request type (GET, POST, etc.).
-            // Only allow POST requests for this operation.
-            // This operation requires a POST request, because the
-            // client is "posting" information to the server for processing.
-            if (exchange.getRequestMethod().toLowerCase().equals("post")) {
+            // Get request
+            if (exchange.getRequestMethod().toLowerCase().equals("get")) {
 
                 // Get the HTTP request headers
                 Headers reqHeaders = exchange.getRequestHeaders();
@@ -63,72 +41,70 @@ public class PersonHandler implements HttpHandler {
                     // Extract the auth token from the "Authorization" header
                     String authToken = reqHeaders.getFirst("Authorization");
 
-                    // Verify that the auth token is the one we're looking for
-                    // (this is not realistic, because clients will use different
-                    // auth tokens over time, not the same one all the time).
-                    if (authToken.equals("afj232hj2332")) {
-
-                        // Extract the JSON string from the HTTP request body
-
-                        // Get the request body input stream
-                        InputStream reqBody = exchange.getRequestBody();
-
-                        // Read JSON string from the input stream
-                        String reqData = readString(reqBody);
-
-                        // Display/log the request JSON data
-                        System.out.println(reqData);
-
-                        // TODO: Claim a route based on the request data
-
-						/*
-						LoginRequest request = (LoginRequest)gson.fromJson(reqData, LoginRequest.class);
-
-						LoginService service = new LoginService();
-						LoginResult result = service.login(request);
-
-						exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
-						OutputStream resBody = exchange.getResponseBody();
-						gson.toJson(result, resBody);
-						resBody.close();
-						*/
-
-                        // Start sending the HTTP response to the client, starting with
-                        // the status code and any defined headers.
-                        exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
-
-                        // We are not sending a response body, so close the response body
-                        // output stream, indicating that the response is complete.
-                        exchange.getResponseBody().close();
-
-                        success = true;
-                    }
+                    success = handlePerson(exchange, success, parts, authToken);
                 }
             }
 
             if (!success) {
-                // The HTTP request was invalid somehow, so we return a "bad request"
-                // status code to the client.
                 exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
-
-                // We are not sending a response body, so close the response body
-                // output stream, indicating that the response is complete.
                 exchange.getResponseBody().close();
             }
-        }
-        catch (IOException e) {
-            // Some kind of internal error has occurred inside the server (not the
-            // client's fault), so we return an "internal server error" status code
-            // to the client.
+        } catch (IOException e) {
             exchange.sendResponseHeaders(HttpURLConnection.HTTP_SERVER_ERROR, 0);
-
-            // We are not sending a response body, so close the response body
-            // output stream, indicating that the response is complete.
             exchange.getResponseBody().close();
-
-            // Display/log the stack trace
             e.printStackTrace();
         }
+    }
+
+    private boolean handlePerson(HttpExchange exchange, boolean success, String[] parts, String authToken) throws IOException {
+        try {
+            //Opening the database
+            Database myDatabase = new Database();
+            myDatabase.openConnection();
+            Connection myConnection = myDatabase.getConnection();
+            AuthTokenDao myAuthTokenDao = new AuthTokenDao(myConnection);
+            AuthToken myAuthtoken = myAuthTokenDao.find(authToken, "authtoken");
+            if (myAuthtoken != null) {
+                //Getting all the family members
+                int numParts = parts.length;
+                if (numParts == 3) {
+                    personID = (parts[2]);
+                }
+                if(personID == null){
+                    handleForSingularPerson(exchange, myAuthtoken);
+                }
+                else{
+                    handleForAllPeople(exchange, myAuthtoken);
+                }
+                success = true;
+                myDatabase.closeConnection(false);
+            } else {
+                myDatabase.closeConnection(false);
+            }
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+        return success;
+    }
+
+    private void handleForAllPeople(HttpExchange exchange, AuthToken myAuthtoken) throws DataAccessException, IOException {
+        PersonService myPersonService = new PersonService(myAuthtoken, personID);
+        Person singularPerson = myPersonService.getSingularPerson();
+        exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
+        Writer resBody = new OutputStreamWriter(exchange.getResponseBody());
+        Gson gson = new Gson();
+        gson.toJson(singularPerson, resBody);
+        resBody.close();
+    }
+
+    private static void handleForSingularPerson(HttpExchange exchange, AuthToken myAuthtoken) throws DataAccessException, IOException {
+        PersonService myPersonService = new PersonService(myAuthtoken);
+        Person[] listOfPeople = myPersonService.getListOfPeopleFinal();
+        exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
+        Writer resBody = new OutputStreamWriter(exchange.getResponseBody());
+        Gson gson = new Gson();
+        gson.toJson(listOfPeople, resBody);
+        resBody.close();
     }
 
     /*

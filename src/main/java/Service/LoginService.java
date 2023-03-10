@@ -1,7 +1,10 @@
 package Service;
 
+import DataAccess.AuthTokenDao;
+import DataAccess.DataAccessException;
 import DataAccess.UserDao;
 import Model.AuthToken;
+import Model.User;
 import Request.LoginRequest;
 import Result.LoginResult;
 
@@ -11,13 +14,29 @@ import Result.LoginResult;
 public class LoginService {
     private AuthToken userToken;
     private UserDao myUserDao;
+    private AuthTokenDao myAuthTokenDao;
+    LoginRequest myRequest;
+    private LoginResult myResult;
     /**
-     * The wonderful default constructor
+     * The wonderful default constructor, dont use
      */
-    public LoginService(){
-        LoginRequest myRequest = new LoginRequest();
-        LoginResult myResult = new LoginResult(myRequest);
-        userToken = myResult.getUserAuthtoken();
+    public LoginService(){}
+    /**
+     * Logs you in baby
+     * @param myRequest
+     */
+    public LoginService(LoginRequest myRequest) throws DataAccessException {
+        try{
+            this.myRequest = myRequest;
+            User myUser = myUserDao.find(myRequest.getUsername());
+            if (myUser.getPassword()== myRequest.getPassword()){
+                userToken = myAuthTokenDao.find(myRequest.getUsername(),"username");
+            }
+            myResult.success();
+        } catch (DataAccessException e) {
+            myResult.fail(e);
+            throw new RuntimeException(e);
+        }
     }
 
     public AuthToken getUserToken() {
@@ -28,11 +47,7 @@ public class LoginService {
         this.userToken = userToken;
     }
 
-    public UserDao getMyUserDao() {
-        return myUserDao;
-    }
-
-    public void setMyUserDao(UserDao myUserDao) {
-        this.myUserDao = myUserDao;
+    public LoginResult getMyResult() {
+        return myResult;
     }
 }

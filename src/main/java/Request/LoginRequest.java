@@ -4,25 +4,26 @@ package Request;
  * Request to make a new login
  */
 public class LoginRequest {
-    String requestBody;
+    String username;
+    String password;
     /**
      * The wonderful default constructor
      */
     public LoginRequest(){
     }
-    /**
-     * Login with request body
-     */
-    public LoginRequest(String requestBody){
-        this.requestBody = requestBody;
-
+    public String getUsername() {
+        return username;
     }
 
-    public String getRequestBody() {
-        return requestBody;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public void setRequestBody(String requestBody) {
-        this.requestBody = requestBody;
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

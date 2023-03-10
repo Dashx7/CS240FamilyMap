@@ -34,12 +34,15 @@ public class AuthTokenDao {
         }
     }
 
-    public AuthToken find(String authtoken) throws DataAccessException {
+    public AuthToken find(String attribute, String type) throws DataAccessException {
+        if(type != "authtoken" || type !="username"){
+            return null;
+        }
         AuthToken authToken;
         ResultSet rs;
-        String sql = "SELECT * FROM Authtoken WHERE authtoken = ?;";
+        String sql = "SELECT * FROM Authtoken WHERE " + type + " = ?;";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, authtoken);
+            stmt.setString(1, attribute);
             rs = stmt.executeQuery();
             if (rs.next()) {
                 authToken = new AuthToken();

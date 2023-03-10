@@ -45,19 +45,13 @@ public class ClearHandler implements HttpHandler {
                     Gson gson = new Gson();
                     gson.toJson(result, resBody); //Writes it to the resBody
                     resBody.close();
-                    //exchange.getResponseBody().close();
                     success = true;
                 }
 
             }
 
             if (!success) {
-                // The HTTP request was invalid somehow, so we return a "bad request"
-                // status code to the client.
                 exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
-
-                // We are not sending a response body, so close the response body
-                // output stream, indicating that the response is complete.
                 exchange.getResponseBody().close();
             }
         } catch (IOException e) {

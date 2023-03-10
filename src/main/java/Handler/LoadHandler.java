@@ -40,22 +40,10 @@ public class LoadHandler implements HttpHandler {
                 LoadResult result = service.getMyResult();
 
                 exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
-                OutputStream resBody = exchange.getResponseBody();
-                gson.toJson((Object) result, (Type) resBody); //FIXME? TF?
+                Writer resBody  = new OutputStreamWriter(exchange.getResponseBody());
+                gson.toJson(result, resBody); //Writes it to the resBody
                 resBody.close();
-						/*
-						LoginRequest request = (LoginRequest)gson.fromJson(reqData, LoginRequest.class);
-
-						LoginService service = new LoginService();
-						LoginResult result = service.login(request);
-
-						exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
-						OutputStream resBody = exchange.getResponseBody();
-						gson.toJson(result, resBody);
-						resBody.close();
-						*/
                 success = true;
-
             }
 
             if (!success) {

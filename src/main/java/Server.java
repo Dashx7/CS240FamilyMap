@@ -78,15 +78,17 @@ public class Server {
         // These are requests to download a file from the server
         // (e.g., web site files)
 
-        //Default context
+        //Default context, when you open the webpage or something that isn't one of the below it defaults to this
         server.createContext("/", new FileHandler());
         //My contexts
         server.createContext("/clear", new ClearHandler());
-        server.createContext("/event/", new EventHandler());
+        server.createContext("/event", new EventHandler());
+//        server.createContext("/event/", new EventHandler()); // Given an event id
         server.createContext("/fill/", new FillHandler());
         server.createContext("/load", new LoadHandler());
         server.createContext("/user/login", new LoginHandler());
         server.createContext("/person", new PersonHandler());
+//        server.createContext("/person/", new PersonHandler()); //Given an person ID
         server.createContext("/user/register", new RegisterHandler());
 
 

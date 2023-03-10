@@ -1,8 +1,11 @@
 package DataAccess;
 
 import Model.Event;
+import Model.Person;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -41,12 +44,15 @@ public class EventDao {
         }
     }
 
-    public Event find(String eventID) throws DataAccessException {
+    public Event find(String attribute, String type) throws DataAccessException {
+        if(type == ""){
+            type = "eventID"; //default to eventID
+        }
         Event event;
         ResultSet rs;
-        String sql = "SELECT * FROM Event WHERE eventID = ?;";
+        String sql = "SELECT * FROM Event WHERE " + type + " = ?;";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, eventID);
+            stmt.setString(1, attribute);
             rs = stmt.executeQuery();
             if (rs.next()) {
                 event = new Event(rs.getString("EventID"), rs.getString("AssociatedUsername"),
@@ -57,6 +63,31 @@ public class EventDao {
             } else {
                 return null;
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataAccessException("Error encountered while finding an event in the database");
+        }
+
+    }
+    public Event[] findAll(String attribute, String type) throws DataAccessException {
+        if(type == ""){
+            type = "eventID"; //default to eventID
+        }
+        Event event;
+        List<Event> events = new ArrayList<>();
+        ResultSet rs;
+        String sql = "SELECT * FROM Event WHERE associatedUsername = ?;";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, attribute);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                event = new Event(rs.getString("EventID"), rs.getString("AssociatedUsername"),
+                        rs.getString("PersonID"), rs.getFloat("Latitude"), rs.getFloat("Longitude"),
+                        rs.getString("Country"), rs.getString("City"), rs.getString("EventType"),
+                        rs.getInt("Year"));
+                events.add(event);
+            }
+            return (Event[]) events.toArray();
         } catch (SQLException e) {
             e.printStackTrace();
             throw new DataAccessException("Error encountered while finding an event in the database");
