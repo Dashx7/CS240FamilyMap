@@ -8,7 +8,7 @@ import Model.Person;
  */
 public class PersonResult {
 
-    String message; //No message?
+    String message; //Message only when fail
     boolean success;
     Person singularPerson;
     Person [] personList;

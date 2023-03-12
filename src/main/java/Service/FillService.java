@@ -59,6 +59,7 @@ public class FillService {
         try {
             this.username = username;
             this.generations = generations;
+
             //Opening the database and the Dao connections
             myDatabase.openConnection();
             Connection myConnection = myDatabase.getConnection();
@@ -84,7 +85,7 @@ public class FillService {
 
                 //Start generation
                 generateTree(generations, thePerson, userBirthID);
-                myPersonDao.insert(thePerson);
+                //myPersonDao.insert(thePerson);
 
                 myResults.success();
                 myResults.setMessage("Successfully added "+ totalPeople +" persons and " + totalEvents + " events to the database.");
@@ -114,7 +115,7 @@ public class FillService {
             child.setMotherID(mother.getPersonID());
             alterAmount = Math.abs(myRand.nextInt())%(MAXPARENTAGE-MINPARENTAGE)+MINPARENTAGE; //13-50 alter
             int motherBornYear = childBirth - alterAmount;
-            String motherBornID = CreateEvent("birth", mother.getPersonID(),motherBornYear);// Birth mother
+            String motherBornEventID = CreateEvent("birth", mother.getPersonID(),motherBornYear);// Birth mother
 
             //Generate father
             Person father = generatePerson("m");
@@ -122,10 +123,12 @@ public class FillService {
             child.setFatherID(father.getPersonID());
             alterAmount = Math.abs(myRand.nextInt())%(MAXPARENTAGE-MINPARENTAGE)+MINPARENTAGE; //13-50 alter
             int fatherBornYear = childBirth - alterAmount;
-            String fatherBornID = CreateEvent("birth", father.getPersonID(),fatherBornYear); //Birth father
+            String fatherBornEventID = CreateEvent("birth", father.getPersonID(),fatherBornYear); //Birth father
+
+            myPersonDao.insert(child); // Inserting child before new generation and after mother/father ID is set
 
             //They married now
-            father.setSpouseID(mother.getPersonID()); //Set spouse Ids to each other
+            father.setSpouseID(mother.getPersonID()); //Set spouse IDs to each other
             mother.setSpouseID(father.getPersonID());
             //Pick their wedding location and year
             Random myRandom = new Random();
@@ -146,11 +149,13 @@ public class FillService {
             CreateEvent("death",father.getPersonID(),fatherDeathYear);
             CreateEvent("death",mother.getPersonID(),motherDeathYear);
 
-            myPersonDao.insert(mother);
-            myPersonDao.insert(father);
+
             //Generate next generation
-            generateTree(generations-1,mother,motherBornID);
-            generateTree(generations-1,father,fatherBornID);
+            generateTree(generations-1,mother,motherBornEventID);
+            generateTree(generations-1,father,fatherBornEventID);
+        }
+        else{
+            myPersonDao.insert(child); // Inserting the last gen
         }
     }
 
@@ -165,12 +170,12 @@ public class FillService {
         String lastname = mySnames.getData()[randIndex];
 
         //Generate myPerson based on gender
-        if (gender.contains("f")){
+        if (gender.compareToIgnoreCase("f")==0){
             randIndex = Math.abs(myRandom.nextInt())% myFnames.getData().length;
             String firstname = myFnames.getData()[randIndex];
             myPerson = new Person(personID,"",firstname,lastname,"f","","","");
         }
-        else if(gender.contains("m")){
+        else if(gender.compareToIgnoreCase("m")==0){
             randIndex = Math.abs(myRandom.nextInt())% myMnames.getData().length;
             String firstname = myMnames.getData()[randIndex];
             myPerson = new Person(personID,"",firstname,lastname,"m","","","");

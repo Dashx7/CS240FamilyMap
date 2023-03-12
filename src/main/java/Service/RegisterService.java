@@ -19,6 +19,7 @@ public class RegisterService {
     UserDao myUserDao;
     AuthTokenDao myAuthTokenDao;
     RegisterResult myResult = new RegisterResult();
+
     /**
      * The wonderful default constructor
      */
@@ -32,10 +33,10 @@ public class RegisterService {
         myUserDao = new UserDao(myConnection);
         myAuthTokenDao = new AuthTokenDao(myConnection);
 
-        String personID = UUID.randomUUID().toString().substring(0,8); //Makes a unique ID
-        String authToken = UUID.randomUUID().toString().substring(0,8); //Makes a unique authToken
+        String personID = UUID.randomUUID().toString().substring(0, 8); //Makes a unique ID
+        String authToken = UUID.randomUUID().toString().substring(0, 8); //Makes a unique authToken
         User newUser = new User(theRequest, personID);
-        try{
+        try {
             //Put the new user in the database
             myUserDao.insert(newUser);
             //Set the results
@@ -50,9 +51,11 @@ public class RegisterService {
             toInsert.setAuthToken(authToken);
             toInsert.setUserName(newUser.getUsername());
             myAuthTokenDao.insert(toInsert);
-
-            //TODO how do we generate ancestors
             myDatabase.closeConnection(true);
+
+            //myUserDao.ins
+            FillService myFillService = new FillService(newUser.getUsername(), 4);
+
 
         } catch (DataAccessException e) {
             myResult.setSuccess(false);
@@ -66,22 +69,4 @@ public class RegisterService {
     public RegisterResult getMyResult() {
         return myResult;
     }
-
-    //    public void generateTree(int generations) throws DataAccessException {
-//        if (generations > 0) {
-//            generations--;
-//            Set<Person> familyTreeLatestTemp = familyTreeLatest;
-//            familyTreeLatest.clear();
-//            for (Person thePerson : familyTreeLatestTemp) {
-//                familyTreeLatest.add(myPersonDao.find(thePerson.getFatherID(), "ID"));
-//                familyTreeAll.add(myPersonDao.find(thePerson.getFatherID(), "ID"));
-//                familyTreeLatest.add(myPersonDao.find(thePerson.getMotherID(), "ID"));
-//                familyTreeAll.add(myPersonDao.find(thePerson.getMotherID(), "ID"));
-//            }
-//            generateTree();
-//        } else {
-//            //Finished the
-//            generateEvents();
-//        }
-//    }
 }

@@ -16,6 +16,8 @@ import com.sun.net.httpserver.*;
 
 public class EventHandler implements HttpHandler {
     String eventID = null;
+    EventService myEventService;
+    EventResult result;
 
     /**
      * @param exchange the exchange containing the request from the
@@ -23,6 +25,8 @@ public class EventHandler implements HttpHandler {
      */
     @Override
     public void handle(HttpExchange exchange) throws IOException {
+        myEventService = new EventService();
+        result = new EventResult();
         String httpURI = exchange.getRequestURI().toString();
         String[] parts = httpURI.split("/");
         // Get request
@@ -32,10 +36,13 @@ public class EventHandler implements HttpHandler {
             Headers reqHeaders = exchange.getRequestHeaders();
             // Check to see if an "Authorization" header is present
             if (reqHeaders.containsKey("Authorization")) {
-                // Extract the auth token from the "Authorization" header
-                String authToken = reqHeaders.getFirst("Authorization");
-                boolean success = false;
                 try {
+                    // Extract the auth token from the "Authorization" header
+                    String authToken = reqHeaders.getFirst("Authorization");
+                    if (authToken.compareTo("") == 0) {
+                        throw new DataAccessException("No authtoken found");
+                    }
+
                     //Opening the database
                     Database myDatabase = new Database();
                     myDatabase.openConnection();
@@ -44,49 +51,42 @@ public class EventHandler implements HttpHandler {
                     //Make sure authtoken is valid
                     AuthTokenDao myAuthTokenDao = new AuthTokenDao(myConnection);
                     AuthToken myAuthtoken = myAuthTokenDao.find(authToken, "authtoken");
+                    myDatabase.closeConnection(false);
                     if (myAuthtoken != null) {
                         int numParts = parts.length;
                         if (numParts == 3) {
                             eventID = (parts[2]);
-                        }
-                        EventResult result = new EventResult();
-                        try {
-                            EventService myEventService = new EventService();
                             if (eventID == null) {
-                                myEventService.EventServiceAll(myAuthtoken);
-                                Event[] myEvents = myEventService.getListOfEventsFinal();
+                                throw new DataAccessException("No eventID after URL");
                             } else {
                                 myEventService.EventServiceSingular(myAuthtoken.getUserName(), eventID);
-                                Event myEvent = myEventService.getSingularEvent();
                             }
-                            result = myEventService.getMyResult();
+                        } else if (eventID == null) {
+                            myEventService.EventServiceAll(myAuthtoken);
+                        }
+                        result = myEventService.getMyResult();
 
-                            //Returning a success
+                        //Returning a success
+                        if (result.isSuccess()) {
                             exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
-                            Writer resBody = new OutputStreamWriter(exchange.getResponseBody());
-                            Gson gson = new Gson();
-                            gson.toJson(result, resBody);
-                            resBody.close();
-                        }
-                        catch (DataAccessException e) {
-                            //Failed to access
-                            result.setMessage("Failed because :" + e.toString());
-                            result.setSuccess(false);
+                        } else {
                             exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
-                            Writer resBody = new OutputStreamWriter(exchange.getResponseBody());
-                            Gson gson = new Gson();
-                            gson.toJson(result, resBody);
-                            resBody.close();
                         }
-                        success = true;
+                        Writer resBody = new OutputStreamWriter(exchange.getResponseBody());
+                        Gson gson = new Gson();
+                        gson.toJson(result, resBody);
+                        resBody.close();
+                    } else {
+                        throw new DataAccessException("Error: Did not have a valid Authtoken");
                     }
-                    myDatabase.closeConnection(false);
 
                 } catch (DataAccessException e) {
+                    result.setMessage("Error: " + e.toString() + ", " + e.returnMessage());
+                    result.setSuccess(false);
                     exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
                     Writer resBody = new OutputStreamWriter(exchange.getResponseBody());
                     Gson gson = new Gson();
-                    //gson.toJson(myEvents, resBody);
+                    gson.toJson(result, resBody);
                     resBody.close();
                 }
             }

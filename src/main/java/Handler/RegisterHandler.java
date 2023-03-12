@@ -42,19 +42,6 @@ public class RegisterHandler implements HttpHandler {
                 Writer resBody  = new OutputStreamWriter(exchange.getResponseBody());
                 gson.toJson(result, resBody); //Writes it to the resBody
                 resBody.close();
-
-						/*
-						LoginRequest request = (LoginRequest)gson.fromJson(reqData, LoginRequest.class);
-
-						LoginService service = new LoginService();
-						LoginResult result = service.login(request);
-
-						exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
-						OutputStream resBody = exchange.getResponseBody();
-						gson.toJson(result, resBody);
-						resBody.close();
-						*/
-
             }
         } catch (IOException e) {
             // Some kind of internal error has occurred inside the server (not the

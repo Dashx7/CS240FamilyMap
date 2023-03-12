@@ -15,7 +15,7 @@ public class UserDao {
     }
 
     public void insert(User user) throws DataAccessException {
-        if(user.getGender().contains("m") && user.getGender().contains("f")){
+        if(user.getGender().compareToIgnoreCase("m")!=0 && user.getGender().compareToIgnoreCase("f")!=0){
             throw new DataAccessException("Invalid Gender");
         }
         else if(find(user.getUsername())!=null){

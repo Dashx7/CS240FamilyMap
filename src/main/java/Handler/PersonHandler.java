@@ -16,6 +16,7 @@ import com.sun.net.httpserver.*;
 
 public class PersonHandler implements HttpHandler {
     String personID = null;
+    PersonResult result = new PersonResult();
     /**
      *
      * @param exchange the exchange containing the request from the
@@ -24,8 +25,6 @@ public class PersonHandler implements HttpHandler {
      */
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-
-        boolean success = false;
         String httpURI = exchange.getRequestURI().toString();
         String[] parts = httpURI.split("/");
 
@@ -41,13 +40,37 @@ public class PersonHandler implements HttpHandler {
                     // Extract the auth token from the "Authorization" header
                     String authToken = reqHeaders.getFirst("Authorization");
 
-                    success = handlePerson(exchange, success, parts, authToken);
-                }
-            }
+                    try {
+                        //Opening the database
+                        Database myDatabase = new Database();
+                        myDatabase.openConnection();
+                        Connection myConnection = myDatabase.getConnection();
 
-            if (!success) {
-                exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
-                exchange.getResponseBody().close();
+                        //Pull up the authToken
+                        AuthTokenDao myAuthTokenDao = new AuthTokenDao(myConnection);
+                        AuthToken myAuthtoken = myAuthTokenDao.find(authToken);
+                        if (myAuthtoken != null) {
+                            int numParts = parts.length;
+                            if (numParts == 3) {
+                                personID = (parts[2]);
+                                handleWithID(exchange, myAuthtoken);
+                            }
+                            else if(personID == null){
+                                handleWithoutID(exchange, myAuthtoken);
+                            } else {result.setMessage("IDK, consult your local programmer");
+                                result.setSuccess(false);
+                                myDatabase.closeConnection(false);
+                            }
+                        } else {
+                            result.setMessage("Not Authorized");
+                            result.setSuccess(false);
+                            myDatabase.closeConnection(false);
+                        }
+                    } catch (DataAccessException e) {
+                        result.setMessage("Failed");
+                        result.setSuccess(false);
+                    }
+                }
             }
         } catch (IOException e) {
             exchange.sendResponseHeaders(HttpURLConnection.HTTP_SERVER_ERROR, 0);
@@ -56,61 +79,28 @@ public class PersonHandler implements HttpHandler {
         }
     }
 
-    private boolean handlePerson(HttpExchange exchange, boolean success, String[] parts, String authToken) throws IOException {
-        try {
-            //Opening the database
-            Database myDatabase = new Database();
-            myDatabase.openConnection();
-            Connection myConnection = myDatabase.getConnection();
-            AuthTokenDao myAuthTokenDao = new AuthTokenDao(myConnection);
-            AuthToken myAuthtoken = myAuthTokenDao.find(authToken);
-            if (myAuthtoken != null) {
-                //Getting all the family members
-                int numParts = parts.length;
-                if (numParts == 3) {
-                    personID = (parts[2]);
-                }
-                if(personID == null){
-                    handleWithoutID(exchange, myAuthtoken);
-                }
-                else{
-                    handleWithID(exchange, myAuthtoken);
-                }
-                myDatabase.closeConnection(false);
-            } else {
-                myDatabase.closeConnection(false);
-            }
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-        return success;
-    }
-
     private void handleWithID(HttpExchange exchange, AuthToken myAuthtoken) throws DataAccessException, IOException {
         PersonService myPersonService = new PersonService(myAuthtoken, personID);
-        Person singularPerson = myPersonService.getSingularPerson();
         PersonResult result = myPersonService.getResult();
-        result.setSingularPerson(singularPerson);
+        result.setSingularPerson(myPersonService.getSingularPerson());
 
-        //Sending response
-        exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
-        Writer resBody = new OutputStreamWriter(exchange.getResponseBody());
-        Gson gson = new Gson();
-        gson.toJson(singularPerson, resBody);
-        resBody.close();
+        sendResponse(exchange, result);
     }
 
     private static void handleWithoutID(HttpExchange exchange, AuthToken myAuthtoken) throws DataAccessException, IOException {
         PersonService myPersonService = new PersonService(myAuthtoken);
-        Person[] listOfPeople = myPersonService.getListOfPeopleFinal();
         PersonResult result = myPersonService.getResult();
-        result.setPersonList(listOfPeople);
+        result.setPersonList(myPersonService.getListOfPeopleFinal());
 
+        sendResponse(exchange, result);
+    }
+
+    private static void sendResponse(HttpExchange exchange, PersonResult result) throws IOException {
         //Sending response
         exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
         Writer resBody = new OutputStreamWriter(exchange.getResponseBody());
         Gson gson = new Gson();
-        gson.toJson(listOfPeople, resBody);
+        gson.toJson(result, resBody);
         resBody.close();
     }
 
