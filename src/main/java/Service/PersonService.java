@@ -6,6 +6,7 @@ import DataAccess.Database;
 import DataAccess.PersonDao;
 import Model.AuthToken;
 import Model.Person;
+import Result.PersonResult;
 //import Request.LoginRequest;
 //import Request.PersonRequest;
 //import Result.LoginResult;
@@ -27,6 +28,8 @@ public class PersonService {
     Person singularPerson;
     List<Person> listOfPeople = new ArrayList<>();
     Person[] listOfPeopleFinal;
+
+    PersonResult result = new PersonResult();
 
 
     public PersonService(AuthToken theAuthToken) throws DataAccessException {
@@ -109,4 +112,9 @@ public class PersonService {
         }
 
     }
+
+    public PersonResult getResult() {
+        return result;
+    }
+
 }

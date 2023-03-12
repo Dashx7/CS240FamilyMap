@@ -15,16 +15,8 @@ public class RegisterHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-
-        boolean success = false;
-
         try {
-            if (exchange.getRequestMethod().toLowerCase().equals("post")) {
-
-                // Get the HTTP request headers
-                Headers reqHeaders = exchange.getRequestHeaders();
-                // Check to see if an "Authorization" header is present
-                // Extract the JSON string from the HTTP request body
+            if (exchange.getRequestMethod().equalsIgnoreCase("post")) {
 
                 // Get the request body input stream
                 InputStream reqBody = exchange.getRequestBody();
@@ -35,11 +27,12 @@ public class RegisterHandler implements HttpHandler {
                 // Display/log the request JSON data
                 System.out.println(reqData);
 
-                // TODO: Claim a route based on the request data
+                //Registers them
                 Gson gson = new Gson();
                 RegisterRequest myRequest = gson.fromJson(reqData,RegisterRequest.class);
                 RegisterService myService = new RegisterService(myRequest);
                 RegisterResult result = myService.getMyResult();
+
                 if(result.isSuccess()){
                     exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
                 }

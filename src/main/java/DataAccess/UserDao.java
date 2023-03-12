@@ -15,6 +15,12 @@ public class UserDao {
     }
 
     public void insert(User user) throws DataAccessException {
+        if(user.getGender().contains("m") && user.getGender().contains("f")){
+            throw new DataAccessException("Invalid Gender");
+        }
+        else if(find(user.getUsername())!=null){
+            throw new DataAccessException("Username Take");
+        }
         //We can structure our string to be similar to a sql command, but if we insert question
         //marks we can change them later with help from the statement
         String sql = "INSERT INTO User (username, password, email, firstname, lastname, gender, personID) VALUES(?,?,?,?,?,?,?)";

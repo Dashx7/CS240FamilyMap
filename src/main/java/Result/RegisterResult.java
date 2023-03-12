@@ -7,7 +7,7 @@ import Request.RegisterRequest;
  * For registration handling result
  */
 public class RegisterResult {
-    //String message;
+    String message;
     String authToken;
     String username;
     String personID;
@@ -26,10 +26,6 @@ public class RegisterResult {
      */
     public RegisterResult(){
     }
-    /**
-     * The wonderful non-default constructor
-     * @param myRequest the RegisterRequest
-     */
 //    public RegisterResult(RegisterRequest myRequest){
 //        //setUserAuthToken(myRequest.);
 //        this.username = myRequest.getUsername();
@@ -58,5 +54,13 @@ public class RegisterResult {
 
     public void setPersonID(String personID) {
         this.personID = personID;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

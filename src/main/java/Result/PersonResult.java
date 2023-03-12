@@ -1,7 +1,7 @@
 package Result;
 
-//import Request.PersonRequest;
-import Request.RegisterRequest;
+import Model.Person;
+
 
 /**
  * looking up a Person result
@@ -10,6 +10,8 @@ public class PersonResult {
 
     String message; //No message?
     boolean success;
+    Person singularPerson;
+    Person [] personList;
 
     public String getMessage() {
         return message;
@@ -27,14 +29,26 @@ public class PersonResult {
         this.success = success;
     }
 
+    public Person[] getPersonList() {
+        return personList;
+    }
+
+    public void setPersonList(Person[] personList) {
+        this.personList = personList;
+    }
+
+    public Person getSingularPerson() {
+        return singularPerson;
+    }
+
+    public void setSingularPerson(Person singularPerson) {
+        this.singularPerson = singularPerson;
+    }
+
     /**
      * The wonderful default constructor
      */
     public PersonResult(){
-    }
-    public void success(){
-        //setMessage("Success");
-        setSuccess(true);
     }
 
 }

@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="fasterxml.uuid.java.generator" type="repository">
+    <properties maven-id="com.fasterxml.uuid:java-uuid-generator:4.1.0" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/fasterxml/uuid/java-uuid-generator/4.1.0/java-uuid-generator-4.1.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

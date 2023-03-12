@@ -18,12 +18,11 @@ public class LoginService {
     LoginRequest myRequest;
     private LoginResult myResult = new LoginResult();
     /**
-     * The wonderful default constructor, dont use
+     * The wonderful default constructor, don't use
      */
     public LoginService(){}
     /**
      * Logs you in baby
-     * @param myRequest
      */
     public LoginService(LoginRequest myRequest) throws DataAccessException {
         //Opening the database and the Dao connections
@@ -37,19 +36,24 @@ public class LoginService {
             this.myRequest = myRequest;
             User myUser = myUserDao.find(myRequest.getUsername());
             if(myUser==null){
-                throw new DataAccessException("Username does not exist");
+                DataAccessException e = new DataAccessException("Username does not exist");
+                myResult.fail(e);
+
             }
-            if (myUser.getPassword()== myRequest.getPassword()){
+            else if (myUser.getPassword()== myRequest.getPassword()){
                 userToken = myAuthTokenDao.find(myRequest.getUsername(),"username");
+                myAuthTokenDao.insert(userToken);
+                myResult.success();
             }
             else{
-                throw new DataAccessException("Username and password don't match");
+                DataAccessException e = new DataAccessException("Username and password don't match");
+                myResult.fail(e);
             }
-            myResult.success();
+
         } catch (DataAccessException e) {
             myResult.fail(e);
         }
-        myDatabase.closeConnection(false);
+        myDatabase.closeConnection(true);
     }
 
     public AuthToken getUserToken() {
@@ -63,4 +67,5 @@ public class LoginService {
     public LoginResult getMyResult() {
         return myResult;
     }
+
 }

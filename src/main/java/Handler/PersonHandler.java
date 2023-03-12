@@ -7,9 +7,9 @@ import java.sql.Connection;
 import DataAccess.AuthTokenDao;
 import DataAccess.DataAccessException;
 import DataAccess.Database;
-import DataAccess.PersonDao;
 import Model.AuthToken;
 import Model.Person;
+import Result.PersonResult;
 import Service.PersonService;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.*;
@@ -71,12 +71,11 @@ public class PersonHandler implements HttpHandler {
                     personID = (parts[2]);
                 }
                 if(personID == null){
-                    handleForSingularPerson(exchange, myAuthtoken);
+                    handleWithoutID(exchange, myAuthtoken);
                 }
                 else{
-                    handleForAllPeople(exchange, myAuthtoken);
+                    handleWithID(exchange, myAuthtoken);
                 }
-                success = true;
                 myDatabase.closeConnection(false);
             } else {
                 myDatabase.closeConnection(false);
@@ -87,9 +86,13 @@ public class PersonHandler implements HttpHandler {
         return success;
     }
 
-    private void handleForAllPeople(HttpExchange exchange, AuthToken myAuthtoken) throws DataAccessException, IOException {
+    private void handleWithID(HttpExchange exchange, AuthToken myAuthtoken) throws DataAccessException, IOException {
         PersonService myPersonService = new PersonService(myAuthtoken, personID);
         Person singularPerson = myPersonService.getSingularPerson();
+        PersonResult result = myPersonService.getResult();
+        result.setSingularPerson(singularPerson);
+
+        //Sending response
         exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
         Writer resBody = new OutputStreamWriter(exchange.getResponseBody());
         Gson gson = new Gson();
@@ -97,9 +100,13 @@ public class PersonHandler implements HttpHandler {
         resBody.close();
     }
 
-    private static void handleForSingularPerson(HttpExchange exchange, AuthToken myAuthtoken) throws DataAccessException, IOException {
+    private static void handleWithoutID(HttpExchange exchange, AuthToken myAuthtoken) throws DataAccessException, IOException {
         PersonService myPersonService = new PersonService(myAuthtoken);
         Person[] listOfPeople = myPersonService.getListOfPeopleFinal();
+        PersonResult result = myPersonService.getResult();
+        result.setPersonList(listOfPeople);
+
+        //Sending response
         exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
         Writer resBody = new OutputStreamWriter(exchange.getResponseBody());
         Gson gson = new Gson();
@@ -120,4 +127,5 @@ public class PersonHandler implements HttpHandler {
         }
         return sb.toString();
     }
+
 }

@@ -1,27 +1,23 @@
 package Service;
 
-import DataAccess.DataAccessException;
-import DataAccess.Database;
-import DataAccess.PersonDao;
-import DataAccess.UserDao;
+import DataAccess.*;
 import Model.AuthToken;
-import Model.Person;
+//import Model.Person;
 import Model.User;
 import Result.RegisterResult;
 import Request.RegisterRequest;
 
 import java.sql.Connection;
-import java.util.Set;
+//import java.util.Set;
 import java.util.UUID;
 
 /**
  * The service to register new members
  */
 public class RegisterService {
-    AuthToken userToken;
-    RegisterRequest myRequest;
     PersonDao myPersonDao;
     UserDao myUserDao;
+    AuthTokenDao myAuthTokenDao;
     RegisterResult myResult = new RegisterResult();
     /**
      * The wonderful default constructor
@@ -34,22 +30,33 @@ public class RegisterService {
         Connection myConnection = myDatabase.getConnection();
         myPersonDao = new PersonDao(myConnection);
         myUserDao = new UserDao(myConnection);
-        String personID = UUID.randomUUID().toString().substring(0,8); //Makes a unique ID I hope
-        String authToken = UUID.randomUUID().toString().substring(0,8); //Makes a unique ID I hope
+        myAuthTokenDao = new AuthTokenDao(myConnection);
+
+        String personID = UUID.randomUUID().toString().substring(0,8); //Makes a unique ID
+        String authToken = UUID.randomUUID().toString().substring(0,8); //Makes a unique authToken
         User newUser = new User(theRequest, personID);
         try{
-            myUserDao.insert(newUser); //Put the new user in the database
-            LoginService newLogin = new LoginService(); // FIXME
+            //Put the new user in the database
+            myUserDao.insert(newUser);
+            //Set the results
             myResult.setUsername(theRequest.getUsername());
             myResult.setPersonID(personID);
             myResult.setAuthToken(authToken);
             myResult.setSuccess(true);
-            myDatabase.closeConnection(true);
+
+
+            //Then Putting that Authtoken in
+            AuthToken toInsert = new AuthToken();
+            toInsert.setAuthToken(authToken);
+            toInsert.setUserName(newUser.getUsername());
+            myAuthTokenDao.insert(toInsert);
 
             //TODO how do we generate ancestors
+            myDatabase.closeConnection(true);
 
         } catch (DataAccessException e) {
             myResult.setSuccess(false);
+            myResult.setMessage("Register Failed because" + e + ", " + e.returnMessage());
             myDatabase.closeConnection(false);
             //throw new RuntimeException(e);
         }
@@ -59,7 +66,8 @@ public class RegisterService {
     public RegisterResult getMyResult() {
         return myResult;
     }
-//    public void generateTree(int generations) throws DataAccessException {
+
+    //    public void generateTree(int generations) throws DataAccessException {
 //        if (generations > 0) {
 //            generations--;
 //            Set<Person> familyTreeLatestTemp = familyTreeLatest;
