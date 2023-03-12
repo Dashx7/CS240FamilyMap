@@ -3,6 +3,7 @@ package Handler;
 import java.io.*;
 import java.net.*;
 
+import DataAccess.DataAccessException;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.*;
 import Request.*;
@@ -35,10 +36,20 @@ public class RegisterHandler implements HttpHandler {
                 System.out.println(reqData);
 
                 // TODO: Claim a route based on the request data
-                RegisterRequest myRequest = new RegisterRequest();
                 Gson gson = new Gson();
-                myRequest = gson.fromJson(reqData,RegisterRequest.class);
-                RegisterService myservice = new RegisterService();
+                RegisterRequest myRequest = gson.fromJson(reqData,RegisterRequest.class);
+                RegisterService myService = new RegisterService(myRequest);
+                RegisterResult result = myService.getMyResult();
+                if(result.isSuccess()){
+                    exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
+                }
+                else{
+                    exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
+                }
+                Writer resBody  = new OutputStreamWriter(exchange.getResponseBody());
+                gson.toJson(result, resBody); //Writes it to the resBody
+                resBody.close();
+
 						/*
 						LoginRequest request = (LoginRequest)gson.fromJson(reqData, LoginRequest.class);
 
@@ -51,25 +62,6 @@ public class RegisterHandler implements HttpHandler {
 						resBody.close();
 						*/
 
-                // Start sending the HTTP response to the client, starting with
-                // the status code and any defined headers.
-                exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
-
-                // We are not sending a response body, so close the response body
-                // output stream, indicating that the response is complete.
-                exchange.getResponseBody().close();
-
-                success = true;
-            }
-
-            if (!success) {
-                // The HTTP request was invalid somehow, so we return a "bad request"
-                // status code to the client.
-                exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
-
-                // We are not sending a response body, so close the response body
-                // output stream, indicating that the response is complete.
-                exchange.getResponseBody().close();
             }
         } catch (IOException e) {
             // Some kind of internal error has occurred inside the server (not the
@@ -83,6 +75,8 @@ public class RegisterHandler implements HttpHandler {
 
             // Display/log the stack trace
             e.printStackTrace();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
         }
     }
 

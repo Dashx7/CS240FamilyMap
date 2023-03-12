@@ -39,4 +39,5 @@ public class LoadResult {
     public void setSuccess(boolean success) {
         this.success = success;
     }
+
 }

@@ -1,12 +1,12 @@
 package Service;
 
-import DataAccess.AuthTokenDao;
-import DataAccess.DataAccessException;
-import DataAccess.UserDao;
+import DataAccess.*;
 import Model.AuthToken;
 import Model.User;
 import Request.LoginRequest;
 import Result.LoginResult;
+
+import java.sql.Connection;
 
 /**
  * Service to login
@@ -16,7 +16,7 @@ public class LoginService {
     private UserDao myUserDao;
     private AuthTokenDao myAuthTokenDao;
     LoginRequest myRequest;
-    private LoginResult myResult;
+    private LoginResult myResult = new LoginResult();
     /**
      * The wonderful default constructor, dont use
      */
@@ -26,17 +26,30 @@ public class LoginService {
      * @param myRequest
      */
     public LoginService(LoginRequest myRequest) throws DataAccessException {
+        //Opening the database and the Dao connections
+        Database myDatabase = new Database();
+        myDatabase.openConnection();
+        Connection myConnection = myDatabase.getConnection();
+        myUserDao = new UserDao(myConnection);
+        myAuthTokenDao = new AuthTokenDao(myConnection);
+
         try{
             this.myRequest = myRequest;
             User myUser = myUserDao.find(myRequest.getUsername());
+            if(myUser==null){
+                throw new DataAccessException("Username does not exist");
+            }
             if (myUser.getPassword()== myRequest.getPassword()){
                 userToken = myAuthTokenDao.find(myRequest.getUsername(),"username");
+            }
+            else{
+                throw new DataAccessException("Username and password don't match");
             }
             myResult.success();
         } catch (DataAccessException e) {
             myResult.fail(e);
-            throw new RuntimeException(e);
         }
+        myDatabase.closeConnection(false);
     }
 
     public AuthToken getUserToken() {

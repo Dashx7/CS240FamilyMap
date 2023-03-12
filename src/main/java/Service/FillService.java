@@ -1,20 +1,251 @@
 package Service;
 
-import DataAccess.PersonDao;
-import Request.FillRequest;
+import DataAccess.*;
+import Model.Event;
+import Model.Person;
+import Model.User;
 import Result.FillResults;
+import com.google.gson.Gson;
+import json.*;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.sql.Connection;
+import java.util.Random;
+import java.util.UUID;
 
 /**
  * Service to fill database
  */
 public class FillService {
+    //The list of names
+    Gson gson = new Gson();
+    Fnames myFnames;
+    Mnames myMnames;
+    Snames mySnames;
+    LocationData myLocationData;
+
+
+    //List of DAOs used
+    Database myDatabase = new Database();
     private PersonDao myPersonDao;
+    private UserDao myUserDao;
+    private EventDao myEventDao;
+
+
+    private FillResults myResults = new FillResults();
+
+    //private Set<Person> familyList = new TreeSet<>();
+    //private Set<Event> eventList = new TreeSet<>();
+    //private Set<Event> events = new TreeSet<>();
+
+    String username;
+    int generations;
+
+    User theUser;
+
+    //Little rough in my generation I know
+    int MINMARRIAGEAGE = 13, MINPARENTAGE = 13;
+    int MAXMARRIAGEAGE = 50, MAXPARENTAGE = 50, MINDEATHAGE = 50;
+    int MAXMARRIAGETODEATH = 70;
+    int CURRENTYEAR = 2023;
+    int totalEvents = 0, totalPeople = 0;
     /**
      * The wonderful default constructor
      */
-    public FillService(){
+    public FillService(String username, int generations){
+        intilizeJson();
+        try {
+            this.username = username;
+            this.generations = generations;
+            //Opening the database and the Dao connections
+            myDatabase.openConnection();
+            Connection myConnection = myDatabase.getConnection();
+            myPersonDao = new PersonDao(myConnection);
+            myUserDao = new UserDao(myConnection);
+            myEventDao = new EventDao(myConnection);
 
-        FillRequest myRequest = new FillRequest();
-        FillResults myResults = new FillResults(myRequest);
+            //Finding the user
+            theUser = myUserDao.find(username);
+            if (theUser != null) {
+                //Person thePerson = myPersonDao.find(theUser.getPersonID());
+
+                //Sets up person
+                Person thePerson = generatePerson(theUser.getGender());
+                thePerson.setPersonID(theUser.getPersonID());
+                thePerson.setAssociatedUsername(theUser.getUsername());
+
+                //Clear out anything that was already there
+                myEventDao.clearAll(theUser.getUsername());
+                myPersonDao.clearAll(theUser.getUsername());
+
+                String userBirthID = CreateEvent("birth", theUser.getPersonID(), CURRENTYEAR);
+
+                //Start generation
+                generateTree(generations, thePerson, userBirthID);
+                myPersonDao.insert(thePerson);
+
+                myResults.success();
+                myResults.setMessage("Successfully added "+ totalPeople +" persons and " + totalEvents + " events to the database.");
+                myDatabase.closeConnection(true);
+            } else {
+                myResults.fail(); //User not found
+                myDatabase.closeConnection(false);
+            }
+        } catch (DataAccessException e) {
+            myResults.fail(e); //User not found
+            myDatabase.closeConnection(false);
+        }
+    }
+
+    public void generateTree(int generations, Person child, String childBirthID) throws DataAccessException {
+        Random myRand = new Random();
+        int alterAmount;
+        int childBirth = myEventDao.find(childBirthID).getYear();;
+        if (generations > 0) {
+            totalEvents +=6;
+            totalPeople+=2;
+            String eventID;
+
+            //Generate mother
+            Person mother = generatePerson("f");
+            mother.setAssociatedUsername(child.getAssociatedUsername());
+            child.setMotherID(mother.getPersonID());
+            alterAmount = Math.abs(myRand.nextInt())%(MAXPARENTAGE-MINPARENTAGE)+MINPARENTAGE; //13-50 alter
+            int motherBornYear = childBirth - alterAmount;
+            String motherBornID = CreateEvent("birth", mother.getPersonID(),motherBornYear);// Birth mother
+
+            //Generate father
+            Person father = generatePerson("m");
+            father.setAssociatedUsername(child.getAssociatedUsername());
+            child.setFatherID(father.getPersonID());
+            alterAmount = Math.abs(myRand.nextInt())%(MAXPARENTAGE-MINPARENTAGE)+MINPARENTAGE; //13-50 alter
+            int fatherBornYear = childBirth - alterAmount;
+            String fatherBornID = CreateEvent("birth", father.getPersonID(),fatherBornYear); //Birth father
+
+            //They married now
+            father.setSpouseID(mother.getPersonID()); //Set spouse Ids to each other
+            mother.setSpouseID(father.getPersonID());
+            //Pick their wedding location and year
+            Random myRandom = new Random();
+            int randIndex = Math.abs(myRandom.nextInt())% myLocationData.getData().length;
+            Location myLocation = myLocationData.getData()[randIndex]; //rand location
+            int positive = Math.abs(myRand.nextInt());
+            alterAmount = positive%(MAXMARRIAGEAGE-MINMARRIAGEAGE)+MINMARRIAGEAGE; //13-50 alter
+            int marriageYear = childBirth-alterAmount;
+
+            String MarriageEventID = CreateEvent("marriage", father.getPersonID(),marriageYear,myLocation);
+            CreateEvent("marriage", father.getPersonID(),marriageYear ,myLocation);
+
+            //Kill them
+            alterAmount = Math.abs(myRand.nextInt())%(MAXMARRIAGETODEATH)+MINDEATHAGE; //50-120 alter
+            int fatherDeathYear = fatherBornYear + alterAmount;
+            alterAmount = Math.abs(myRand.nextInt())%(MAXMARRIAGETODEATH)+MINDEATHAGE; //50-120 alter
+            int motherDeathYear = motherBornYear + alterAmount;
+            CreateEvent("death",father.getPersonID(),fatherDeathYear);
+            CreateEvent("death",mother.getPersonID(),motherDeathYear);
+
+            myPersonDao.insert(mother);
+            myPersonDao.insert(father);
+            //Generate next generation
+            generateTree(generations-1,mother,motherBornID);
+            generateTree(generations-1,father,fatherBornID);
+        }
+    }
+
+    public Person generatePerson(String gender) throws DataAccessException {
+        Person myPerson = new Person();
+
+        //Generate personId and lastName
+        String personID = UUID.randomUUID().toString().substring(0,8);
+        Random myRandom = new Random();
+        int postive = Math.abs(myRandom.nextInt());
+        int randIndex = postive%mySnames.getData().length;
+        String lastname = mySnames.getData()[randIndex];
+
+        //Generate myPerson based on gender
+        if (gender.contains("f")){
+            randIndex = Math.abs(myRandom.nextInt())% myFnames.getData().length;
+            String firstname = myFnames.getData()[randIndex];
+            myPerson = new Person(personID,"",firstname,lastname,"f","","","");
+        }
+        else if(gender.contains("m")){
+            randIndex = Math.abs(myRandom.nextInt())% myMnames.getData().length;
+            String firstname = myMnames.getData()[randIndex];
+            myPerson = new Person(personID,"",firstname,lastname,"m","","","");
+        }
+        return myPerson;
+    }
+    private String CreateEvent(String type, String ID, int date) throws DataAccessException {
+        Random myRandom = new Random();
+        int positive = Math.abs(myRandom.nextInt());
+        int randIndex = positive% myLocationData.getData().length;
+        Location myLocation = myLocationData.getData()[randIndex];
+
+        String eventID = UUID.randomUUID().toString().substring(0,8);
+
+        Event event = new Event(eventID,theUser.getUsername(), ID,
+                myLocation.getLatitude(),myLocation.getLongitude(),
+                myLocation.getCountry(),myLocation.getCity(),type, date);
+        myEventDao.insert(event);
+        return event.getEventID();
+    }
+    private String CreateEvent(String type, String ID, int date, Location myLocation) throws DataAccessException {
+        String eventID = UUID.randomUUID().toString().substring(0,8);
+
+        Event event = new Event(eventID,theUser.getUsername(), ID,
+                myLocation.getLatitude(),myLocation.getLongitude(),
+                myLocation.getCountry(),myLocation.getCity(),type, date);
+        myEventDao.insert(event);
+        return event.getEventID();
+    }
+
+
+//    /**
+//     * for each of the people in the family tree
+//     * @throws DataAccessException
+//     */
+//    public void generateEvents() throws DataAccessException{
+//        for (Person thePerson : familyList) {
+//            EventService myEventService = new EventService();
+//            myEventService.EventServiceSingular(thePerson.getAssociatedUsername(), "");
+//            for(Event myEvent: myEventService.getListOfEventsFinal()){
+//                events.add(myEvent);
+//            }
+//        }
+//    }
+
+    //Turing a filepath into a object
+    private Object make(String filePath, Class theClass) throws FileNotFoundException {
+        File file = new File(filePath);
+        FileReader myFileReader = new FileReader(file);
+        Object myO = gson.fromJson(myFileReader,theClass);
+        return myO;
+    }
+    //Initializing all of the Json file I need
+    private void intilizeJson() {
+        try {
+            myFnames = (Fnames) make("src/main/java/json/fnames.json", Fnames.class);
+            myMnames = (Mnames) make("src/main/java/json/mnames.json", Mnames.class);
+            mySnames = (Snames) make("src/main/java/json/snames.json", Snames.class);
+            myLocationData = (LocationData) make("src/main/java/json/locations.json", LocationData.class);
+
+        } catch (FileNotFoundException e) {
+            myResults.fail();
+        }
+    }
+
+    //Getter Setters
+
+    public String getUsername() {
+        return username;
+    }
+
+    public int getGenerations() {
+        return generations;
+    }
+    public FillResults getMyResults() {
+        return myResults;
     }
 }

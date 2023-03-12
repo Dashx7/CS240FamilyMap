@@ -20,20 +20,18 @@ public class ClearService {
     private PersonDao myPersonDao;
     private UserDao myUserDao;
 
-    //TODO WIPE EVERYTHING
-
-
     /**
      * The wonderful default constructor
-     * All the services need a Dao to manipulat e the data that they use
+     * All the services need a Dao to manipulate the data that they use
      */
     public ClearService(){
+        Database myDatabase = new Database();;
         try{
-            Database myDatabase = new Database();
+            //Opening the database and the Dao connections
             myDatabase.openConnection();
             Connection myConnection = myDatabase.getConnection();
             myAuthTokenDao = new AuthTokenDao(myConnection);
-            myAuthTokenDao.clear(); //FIXME
+            myAuthTokenDao.clear();
             myEventDao = new EventDao(myConnection);
             myEventDao.clear();
             myPersonDao = new PersonDao(myConnection);
@@ -45,6 +43,7 @@ public class ClearService {
         }
         catch (DataAccessException e) {
             myResults.error("It failed dataAccessException");
+            myDatabase.closeConnection(false);
             throw new RuntimeException(e);
         }
     }

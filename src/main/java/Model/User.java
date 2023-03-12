@@ -1,5 +1,7 @@
 package Model;
 
+import Request.RegisterRequest;
+
 import java.util.Objects;
 
 /**
@@ -28,6 +30,16 @@ public class User {
         this.lastName = lastName;
         this.gender = gender;
         this.personID = personID;
+    }
+
+    public User(RegisterRequest theRequest, String uuid) {
+        this.username = theRequest.getUsername();
+        this.password = theRequest.getPassword();
+        this.email = theRequest.getEmail();
+        this.firstName = theRequest.getFirstName();
+        this.lastName = theRequest.getLastName();
+        this.gender = theRequest.getGender();
+        this.personID = uuid;
     }
 
     public String getUsername() {
@@ -98,4 +110,13 @@ public class User {
     public int hashCode() {
         return Objects.hash(username, password, email, firstName, lastName, gender, personID);
     }
+
+    //    public User(String username, String password, String email, String firstName, String lastName, String gender) {
+//        this.username = username;
+//        this.password = password;
+//        this.email = email;
+//        this.firstName = firstName;
+//        this.lastName = lastName;
+//        this.gender = gender;
+//    }
 }

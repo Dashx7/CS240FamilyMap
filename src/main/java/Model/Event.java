@@ -9,6 +9,7 @@ public class Event {
     private String eventID;
     private String associatedUsername;
     private String personID;
+
     private float latitude;
     private float longitude;
 

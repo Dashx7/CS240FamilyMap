@@ -41,32 +41,18 @@ public class LoginHandler implements HttpHandler {
                 Gson gson = new Gson();
                 LoginRequest request = (LoginRequest) gson.fromJson(reqData, LoginRequest.class);
                 LoginService myLoginService = new LoginService(request);
-                LoginResult myResult = myLoginService.getMyResult();
-                AuthToken myAuthToken = myLoginService.getUserToken();
-                //Reader resBody  = new InputStreamReader(exchange.getRequestBody());
+                LoginResult result = myLoginService.getMyResult();
+                result.setMyAuthtoken(myLoginService.getUserToken());
 
-                // Start sending the HTTP response to the client, starting with
-                // the status code and any defined headers.
-                exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
+                if(result.isSuccess()){
+                    exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
+                }
+                else{
+                    exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
+                }
                 Writer resBody  = new OutputStreamWriter(exchange.getResponseBody());
-                gson.toJson(myResult, resBody); //Writes it to the resBody
+                gson.toJson(result, resBody); //Writes it to the resBody
                 resBody.close();
-
-                // We are not sending a response body, so close the response body
-                // output stream, indicating that the response is complete.
-                exchange.getResponseBody().close();
-
-                success = true;
-            }
-
-            if (!success) {
-                // The HTTP request was invalid somehow, so we return a "bad request"
-                // status code to the client.
-                exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
-
-                // We are not sending a response body, so close the response body
-                // output stream, indicating that the response is complete.
-                exchange.getResponseBody().close();
             }
         } catch (IOException e) {
             // Some kind of internal error has occurred inside the server (not the

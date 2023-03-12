@@ -1,6 +1,6 @@
 package Result;
 
-import Request.FillRequest;
+import DataAccess.DataAccessException;
 
 /**
  * For populating the database I think
@@ -30,11 +30,18 @@ public class FillResults {
      */
     public FillResults(){
     }
-    /**
-     * The wonderful non-default constructor
-     * @param myRequest the request
-     */
-    public FillResults(FillRequest myRequest){
+
+    public void success(){
+        setSuccess(true);
+        setMessage("Fill succeeded");
+    }
+    public void fail(){
+        setSuccess(false);
+        setMessage("Failed because:" + "Not currently specified");
+    }
+    public void fail(DataAccessException e){
+        setSuccess(false);
+        setMessage("Failed because:" + e.toString() + ", " + e.returnMessage());
     }
 
 }

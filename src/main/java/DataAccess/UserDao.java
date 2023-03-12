@@ -32,7 +32,7 @@ public class UserDao {
 
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             throw new DataAccessException("Error encountered while inserting an User into the database");
         }
     }

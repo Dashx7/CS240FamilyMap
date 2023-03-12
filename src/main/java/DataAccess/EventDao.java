@@ -44,6 +44,28 @@ public class EventDao {
         }
     }
 
+    public Event find(String eventIDString) throws DataAccessException {
+        Event event;
+        ResultSet rs;
+        String sql = "SELECT * FROM Event WHERE eventID = ?;";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, eventIDString);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                event = new Event(rs.getString("EventID"), rs.getString("AssociatedUsername"),
+                        rs.getString("PersonID"), rs.getFloat("Latitude"), rs.getFloat("Longitude"),
+                        rs.getString("Country"), rs.getString("City"), rs.getString("EventType"),
+                        rs.getInt("Year"));
+                return event;
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataAccessException("Error encountered while finding an event in the database");
+        }
+
+    }
     public Event find(String attribute, String type) throws DataAccessException {
         if(type == ""){
             type = "eventID"; //default to eventID
@@ -76,7 +98,7 @@ public class EventDao {
         Event event;
         List<Event> events = new ArrayList<>();
         ResultSet rs;
-        String sql = "SELECT * FROM Event WHERE associatedUsername = ?;";
+        String sql = "SELECT * FROM Event WHERE " + type + " = ?;";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, attribute);
             rs = stmt.executeQuery();
@@ -102,6 +124,16 @@ public class EventDao {
         } catch (SQLException e) {
             e.printStackTrace();
             throw new DataAccessException("Error encountered while clearing the event table");
+        }
+    }
+    public void clearAll(String attribute) throws DataAccessException {
+        String sql = "DELETE FROM Event WHERE associatedUsername = ?;";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, attribute);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataAccessException("Error encountered while finding an event in the database");
         }
     }
 

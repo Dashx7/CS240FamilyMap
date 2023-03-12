@@ -1,14 +1,17 @@
 package Service;
 
 import DataAccess.DataAccessException;
+import DataAccess.Database;
+//import DataAccess.EventDao;
 import DataAccess.PersonDao;
 import Model.AuthToken;
 import Model.Person;
-import Request.LoginRequest;
+//import Request.LoginRequest;
 //import Request.PersonRequest;
-import Result.LoginResult;
-import Result.PersonResult;
+//import Result.LoginResult;
+//import Result.PersonResult;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,18 +25,32 @@ public class PersonService {
     private PersonDao myPersonDao;
     private AuthToken myAuthToken;
     Person singularPerson;
-    List<Person> listOfPeople = new ArrayList<Person>();
+    List<Person> listOfPeople = new ArrayList<>();
     Person[] listOfPeopleFinal;
 
 
     public PersonService(AuthToken theAuthToken) throws DataAccessException {
+        //Opening the database and the Dao connections
+        Database myDatabase = new Database();
+        myDatabase.openConnection();
+        Connection myConnection = myDatabase.getConnection();
+        myPersonDao = new PersonDao(myConnection);
+
         myAuthToken = theAuthToken;
         //Create the person from finding it in the database using its name
         singularPerson = myPersonDao.find(myAuthToken.getUserName());
         generateAllRelatives(singularPerson);
         listOfPeopleFinal = (Person[]) listOfPeople.toArray();
+
+        myDatabase.closeConnection(false);
     }
     public PersonService(AuthToken theAuthToken, String personIDToFind) throws DataAccessException {
+        //Opening the database and the Dao connections
+        Database myDatabase = new Database();
+        myDatabase.openConnection();
+        Connection myConnection = myDatabase.getConnection();
+        myPersonDao = new PersonDao(myConnection);
+
         myAuthToken = theAuthToken;
         //Create the person from finding it in the database using its name
         singularPerson = myPersonDao.find(myAuthToken.getUserName());
@@ -41,6 +58,7 @@ public class PersonService {
         generateAllRelatives(singularPerson);
         listOfPeopleFinal = (Person[]) listOfPeople.toArray();
 
+        myDatabase.closeConnection(false);
     }
 
     private void generateAllRelatives(Person person) throws DataAccessException {

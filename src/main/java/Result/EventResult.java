@@ -1,7 +1,6 @@
 package Result;
 
 import Request.EventRequest;
-import Request.FillRequest;
 
 /**
  * Results of the events
@@ -10,7 +9,6 @@ public class EventResult {
 
     String message;
     boolean success;
-
     public String getMessage() {
         return message;
     }
@@ -36,6 +34,6 @@ public class EventResult {
      * The wonderful non-default constructor
      * @param myRequest the request
      */
-    public EventResult(EventRequest myRequest){
-    }
+
+
 }

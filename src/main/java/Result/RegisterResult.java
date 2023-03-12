@@ -7,26 +7,12 @@ import Request.RegisterRequest;
  * For registration handling result
  */
 public class RegisterResult {
-    String message;
+    //String message;
+    String authToken;
+    String username;
+    String personID;
+
     boolean success;
-    AuthToken userAuthToken;
-
-    public AuthToken getUserAuthToken() {
-        return userAuthToken;
-    }
-
-    public void setUserAuthToken(AuthToken userAuthToken) {
-        this.userAuthToken = userAuthToken;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
     public boolean isSuccess() {
         return success;
     }
@@ -44,7 +30,33 @@ public class RegisterResult {
      * The wonderful non-default constructor
      * @param myRequest the RegisterRequest
      */
-    public RegisterResult(RegisterRequest myRequest){
+//    public RegisterResult(RegisterRequest myRequest){
+//        //setUserAuthToken(myRequest.);
+//        this.username = myRequest.getUsername();
+//        this.personID = my
+//    }
 
+    public String getAuthToken() {
+        return authToken;
+    }
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPersonID() {
+        return personID;
+    }
+
+    public void setPersonID(String personID) {
+        this.personID = personID;
     }
 }

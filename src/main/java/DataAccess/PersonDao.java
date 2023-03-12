@@ -100,5 +100,25 @@ public class PersonDao {
             throw new DataAccessException("Error encountered while clearing the person table");
         }
     }
+    public void clearAll(String associatedUsername) throws DataAccessException {
+        String sql = "DELETE FROM Person WHERE associatedUsername = ?;";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, associatedUsername);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataAccessException("Error encountered while finding an event in the database");
+        }
+    }
+//    public void clearAll(String attribute, String personID) throws DataAccessException {
+//        String sql = "DELETE FROM Person WHERE personID = ?;";
+//        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+//            stmt.setString(1, attribute);
+//            stmt.executeUpdate();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//            throw new DataAccessException("Error encountered while finding an event in the database");
+//        }
+//    }
 }
 

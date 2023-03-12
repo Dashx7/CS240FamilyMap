@@ -63,7 +63,7 @@ public class PersonHandler implements HttpHandler {
             myDatabase.openConnection();
             Connection myConnection = myDatabase.getConnection();
             AuthTokenDao myAuthTokenDao = new AuthTokenDao(myConnection);
-            AuthToken myAuthtoken = myAuthTokenDao.find(authToken, "authtoken");
+            AuthToken myAuthtoken = myAuthTokenDao.find(authToken);
             if (myAuthtoken != null) {
                 //Getting all the family members
                 int numParts = parts.length;
