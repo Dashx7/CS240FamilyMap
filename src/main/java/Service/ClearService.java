@@ -28,7 +28,6 @@ public class ClearService {
         Database myDatabase = new Database();;
         try{
             //Opening the database and the Dao connections
-            myDatabase.openConnection();
             Connection myConnection = myDatabase.getConnection();
             myAuthTokenDao = new AuthTokenDao(myConnection);
             myAuthTokenDao.clear();
@@ -38,11 +37,13 @@ public class ClearService {
             myPersonDao.clear();
             myUserDao = new UserDao(myConnection);
             myUserDao.clear();
+
+            //Finishing it
             myDatabase.closeConnection(true);
             myResults.success();
         }
         catch (DataAccessException e) {
-            myResults.error("It failed dataAccessException");
+            myResults.error("Error: It failed dataAccessException");
             myDatabase.closeConnection(false);
             throw new RuntimeException(e);
         }

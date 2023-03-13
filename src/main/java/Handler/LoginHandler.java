@@ -4,9 +4,7 @@ import java.io.*;
 import java.net.*;
 
 import DataAccess.DataAccessException;
-import Model.AuthToken;
 import Request.LoginRequest;
-import Model.User;
 import Service.LoginService;
 import Result.LoginResult;
 import com.google.gson.Gson;
@@ -17,16 +15,9 @@ public class LoginHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
-        boolean success = false;
-
         try {
             // This HTTPS request is a post
             if (exchange.getRequestMethod().equalsIgnoreCase("post")) {
-
-                // Get the HTTP request headers
-                Headers reqHeaders = exchange.getRequestHeaders();
-
-                // Extract the JSON string from the HTTP request body
 
                 // Get the request body input stream
                 InputStream reqBody = exchange.getRequestBody();
@@ -37,12 +28,11 @@ public class LoginHandler implements HttpHandler {
                 // Display/log the request JSON data
                 System.out.println(reqData);
 
-                // TODO: Login
                 Gson gson = new Gson();
                 LoginRequest request = (LoginRequest) gson.fromJson(reqData, LoginRequest.class);
                 LoginService myLoginService = new LoginService(request);
                 LoginResult result = myLoginService.getMyResult();
-                result.setMyAuthtoken(myLoginService.getUserToken());
+                //result.s(myLoginService.getUserToken());
 
                 if(result.isSuccess()){
                     exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);

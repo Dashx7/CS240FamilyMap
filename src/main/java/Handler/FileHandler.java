@@ -46,10 +46,7 @@ public class FileHandler implements HttpHandler {
         boolean success = false;
 
         try {
-            // Determine the HTTP request type (GET, POST, etc.).
-            // Only allow POST requests for this operation.
-            // This operation requires a POST request, because the
-            // client is "posting" information to the server for processing.
+            // Get request
             if (exchange.getRequestMethod().toLowerCase().equals("get")) {
                 String urlPath = null;
                 urlPath = exchange.getRequestURI().toString();
@@ -75,7 +72,7 @@ public class FileHandler implements HttpHandler {
             if (!success) {
                 // The HTTP request was invalid somehow, so we return a "bad request"
                 // status code to the client.
-                exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
+                exchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, 0);
 
                 // We are not sending a response body, so close the response body
                 // output stream, indicating that the response is complete.
@@ -85,7 +82,7 @@ public class FileHandler implements HttpHandler {
             // Some kind of internal error has occurred inside the server (not the
             // client's fault), so we return an "internal server error" status code
             // to the client.
-            exchange.sendResponseHeaders(HttpURLConnection.HTTP_SERVER_ERROR, 0);
+            exchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, 0);
 
             // We are not sending a response body, so close the response body
             // output stream, indicating that the response is complete.

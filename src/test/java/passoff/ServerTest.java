@@ -1,5 +1,6 @@
 package passoff;
 
+import Service.ClearService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
@@ -136,6 +137,7 @@ public class ServerTest {
         try {
             //We are calling the register api for a user named sheila
             RegisterResult registerResult = proxy.register(host, port, registerRequest);
+
             //Checks to see if registerResult has an authtoken String
             assertNotNull(registerResult.getAuthtoken(), "authtoken was null OR its variable name did not match that of the expected JSon (see API)");
             //Checks to see if you filled registerResult with an authtoken String

@@ -37,11 +37,11 @@ public class FillResults {
     }
     public void fail(){
         setSuccess(false);
-        setMessage("Failed because:" + "Not currently specified");
+        setMessage("Error: Failed because:" + "Not currently specified");
     }
     public void fail(DataAccessException e){
         setSuccess(false);
-        setMessage("Failed because:" + e.toString() + ", " + e.returnMessage());
+        setMessage("Error: Failed because:" + e.toString() + ", " + e.returnMessage());
     }
 
 }

@@ -61,7 +61,6 @@ public class FillService {
             this.generations = generations;
 
             //Opening the database and the Dao connections
-            myDatabase.openConnection();
             Connection myConnection = myDatabase.getConnection();
             myPersonDao = new PersonDao(myConnection);
             myUserDao = new UserDao(myConnection);
@@ -70,7 +69,6 @@ public class FillService {
             //Finding the user
             theUser = myUserDao.find(username);
             if (theUser != null) {
-                //Person thePerson = myPersonDao.find(theUser.getPersonID());
 
                 //Sets up person
                 Person thePerson = generatePerson(theUser.getGender());
@@ -88,9 +86,13 @@ public class FillService {
                 //myPersonDao.insert(thePerson);
 
                 myResults.success();
+                totalEvents+=1;
+                totalPeople+=1;
                 myResults.setMessage("Successfully added "+ totalPeople +" persons and " + totalEvents + " events to the database.");
+
                 myDatabase.closeConnection(true);
-            } else {
+            }
+            else {
                 myResults.fail(); //User not found
                 myDatabase.closeConnection(false);
             }

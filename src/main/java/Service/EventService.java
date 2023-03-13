@@ -24,8 +24,7 @@ public class EventService {
     Database myDatabase= new Database();;
     private PersonService myPersonService;
     Event singularEvent;
-    List<Event> listOfEvents = new ArrayList<>();
-    Event [] eventArray;
+    ArrayList<Event> listOfEvents = new ArrayList<>();
     EventResult myResult = new EventResult();
 
 
@@ -37,8 +36,8 @@ public class EventService {
             myEventDao = new EventDao(myConnection);
 
             //Find all events associated with the authtoken's username and set them to my result
-            eventArray = myEventDao.findAll(theAuthToken.getUserName(), "associatedUsername");
-            myResult.setEventList(eventArray);
+            listOfEvents = myEventDao.findAll(theAuthToken.getUserName(), "associatedUsername");
+            myResult.setEventList(listOfEvents);
             myResult.setSuccess(true);
             myDatabase.closeConnection(true);
 

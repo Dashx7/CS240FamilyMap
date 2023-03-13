@@ -3,6 +3,8 @@ package Result;
 import Model.Event;
 import Request.EventRequest;
 
+import java.util.ArrayList;
+
 /**
  * Results of the events
  */
@@ -10,8 +12,19 @@ public class EventResult {
 
     String message; //Message only when it fails
     boolean success;
-    Event singularEvent;
-    Event[] eventList;
+    ArrayList<Event> data;
+
+    private String eventID;
+    private String associatedUsername;
+    private String personID;
+
+    private float latitude;
+    private float longitude;
+
+    private String country;
+    private String city;
+    private String eventType;
+    private int year;
 
     public String getMessage() {
         return message;
@@ -30,19 +43,28 @@ public class EventResult {
     }
 
     public Event getSingularEvent() {
-        return singularEvent;
+        return data.get(0);
     }
 
     public void setSingularEvent(Event singularEvent) {
-        this.singularEvent = singularEvent;
+        this.eventID = singularEvent.getEventID();
+        this.associatedUsername = singularEvent.getAssociatedUsername();
+        this.personID = singularEvent.getPersonID();;
+        this.latitude = singularEvent.getLatitude();;
+        this.longitude = singularEvent.getLongitude();;
+        this.year = singularEvent.getYear();;
+        this.country = singularEvent.getCountry();;
+        this.city = singularEvent.getCity();;
+        this.eventType = singularEvent.getEventType();;
     }
 
-    public Event[] getEventList() {
-        return eventList;
+    public ArrayList<Event> getEventList() {
+        return data;
     }
 
-    public void setEventList(Event[] eventList) {
-        this.eventList = eventList;
+    public void setEventList(ArrayList<Event> eventList) {
+        this.data = new ArrayList<>();
+        this.data = eventList;
     }
 
     /**

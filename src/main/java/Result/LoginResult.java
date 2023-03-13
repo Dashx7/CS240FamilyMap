@@ -10,7 +10,12 @@ import Request.LoginRequest;
 public class LoginResult {
     String message;
     boolean success;
-    AuthToken myAuthtoken;
+    //apparently I'm dumb
+    //AuthToken myAuthtoken;
+    String authtoken;
+    String username;
+    String personID;
+
     public String getMessage() {
         return message;
     }
@@ -27,20 +32,44 @@ public class LoginResult {
         this.success = success;
     }
 
-    public AuthToken getMyAuthtoken() {
-        return myAuthtoken;
+    public String getAuthtoken() {
+        return authtoken;
     }
 
-    public void setMyAuthtoken(AuthToken myAuthtoken) {
-        this.myAuthtoken = myAuthtoken;
+    public void setAuthtoken(String authtoken) {
+        this.authtoken = authtoken;
     }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPersonID() {
+        return personID;
+    }
+
+    public void setPersonID(String personID) {
+        this.personID = personID;
+    }
+
+    //    public AuthToken getMyAuthtoken() {
+//        return myAuthtoken;
+//    }
+//
+//    public void setMyAuthtoken(AuthToken myAuthtoken) {
+//        this.myAuthtoken = myAuthtoken;
+//    }
 
     public void success(){
        setMessage("Successfully Logged in");
        setSuccess(true);
     }
     public void fail(DataAccessException e){
-        setMessage("Failed due to :" + e.toString() + "," + e.returnMessage());
+        setMessage("Error: Failed due to :" + e.toString() + "," + e.returnMessage());
         setSuccess(false);
     }
 

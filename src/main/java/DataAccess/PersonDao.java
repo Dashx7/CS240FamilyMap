@@ -38,7 +38,7 @@ public class PersonDao {
         }
     }
 
-    public Person find(String associatedUsername) throws DataAccessException {
+    public Person find(String associatedUsername, String forassociatedUsername) throws DataAccessException {
         Person person;
         ResultSet rs;
         String sql = "SELECT * FROM Person WHERE associatedUsername = ?;";
@@ -64,7 +64,7 @@ public class PersonDao {
             throw new DataAccessException("Error encountered while finding an person in the database");
         }
     }
-    public Person find(String personID, String notInUse) throws DataAccessException {
+    public Person find(String personID) throws DataAccessException {
         Person person;
         ResultSet rs;
         String sql = "SELECT * FROM Person WHERE personID = ?;";

@@ -70,7 +70,6 @@ public class ClearHandler implements HttpHandler {
         The readString method shows how to read a String from an InputStream.
     */
     private String readString(InputStream is) throws IOException {
-        //TODO build a string handler
         StringBuilder sb = new StringBuilder();
         InputStreamReader sr = new InputStreamReader(is);
         char[] buf = new char[1024];

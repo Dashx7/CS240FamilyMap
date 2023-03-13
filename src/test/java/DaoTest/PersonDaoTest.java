@@ -47,7 +47,7 @@ public class PersonDaoTest {
         // Start by inserting an event into the database.
         pDao.insert(bestPerson);
         // Let's use a find method to get the event that we just put in back out.
-        Person compareTest = pDao.find(bestPerson.getPersonID());
+        Person compareTest = pDao.find(bestPerson.getPersonID(), "");
         // First lets see if our find method found anything at all. If it did then we know that we got
         // something back from our database.
         assertNotNull(compareTest);

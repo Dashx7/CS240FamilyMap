@@ -27,6 +27,7 @@ public class EventHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         myEventService = new EventService();
         result = new EventResult();
+
         String httpURI = exchange.getRequestURI().toString();
         String[] parts = httpURI.split("/");
         // Get request
@@ -52,6 +53,8 @@ public class EventHandler implements HttpHandler {
                     AuthTokenDao myAuthTokenDao = new AuthTokenDao(myConnection);
                     AuthToken myAuthtoken = myAuthTokenDao.find(authToken, "authtoken");
                     myDatabase.closeConnection(false);
+
+
                     if (myAuthtoken != null) {
                         int numParts = parts.length;
                         if (numParts == 3) {

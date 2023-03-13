@@ -7,6 +7,7 @@ import Request.LoginRequest;
 import Result.LoginResult;
 
 import java.sql.Connection;
+import java.util.UUID;
 
 /**
  * Service to login
@@ -15,45 +16,54 @@ public class LoginService {
     private AuthToken userToken;
     private UserDao myUserDao;
     private AuthTokenDao myAuthTokenDao;
+    Database myDatabase;
+
     LoginRequest myRequest;
     private LoginResult myResult = new LoginResult();
+
     /**
      * The wonderful default constructor, don't use
      */
-    public LoginService(){}
+    public LoginService() {
+    }
+
     /**
      * Logs you in baby
      */
     public LoginService(LoginRequest myRequest) throws DataAccessException {
-        //Opening the database and the Dao connections
-        Database myDatabase = new Database();
-        myDatabase.openConnection();
-        Connection myConnection = myDatabase.getConnection();
-        myUserDao = new UserDao(myConnection);
-        myAuthTokenDao = new AuthTokenDao(myConnection);
+        try {
+            //Opening the database and the Dao connections
+            myDatabase = new Database();
+            //myDatabase.openConnection();
+            Connection myConnection = myDatabase.getConnection();
+            myUserDao = new UserDao(myConnection);
+            myAuthTokenDao = new AuthTokenDao(myConnection);
 
-        try{
             this.myRequest = myRequest;
             User myUser = myUserDao.find(myRequest.getUsername());
-            if(myUser==null){
-                DataAccessException e = new DataAccessException("Username does not exist");
-                myResult.fail(e);
-
+            if (myUser == null) {
+                throw new DataAccessException("Username does not exist");
             }
-            else if (myUser.getPassword()== myRequest.getPassword()){
-                userToken = myAuthTokenDao.find(myRequest.getUsername(),"username");
-                myAuthTokenDao.insert(userToken);
-                myResult.success();
+            else if (myUser.getPassword() == myRequest.getPassword() || myUser.getPassword().compareTo(myRequest.getPassword()) == 0) {
+                userToken = myAuthTokenDao.find(myRequest.getUsername(), "username");
+                if (userToken == null) {
+                    //If the user exists but not the authtoken we make the authtoken... probably
+                    myAuthTokenDao.insert(new AuthToken(UUID.randomUUID().toString().substring(0, 8), myRequest.getUsername()));
+                }
+                //Setting the results when things worked
+                myResult.setSuccess(true);
+                myResult.setUsername(myRequest.getUsername());
+                myResult.setPersonID(myUser.getPersonID());
+                myResult.setAuthtoken(myAuthTokenDao.find(myRequest.getUsername(),"username").getAuthToken());
+                myDatabase.closeConnection(true);
             }
-            else{
-                DataAccessException e = new DataAccessException("Username and password don't match");
-                myResult.fail(e);
+            else {
+                throw new DataAccessException("Username and password do not match");
             }
-
         } catch (DataAccessException e) {
             myResult.fail(e);
+            myDatabase.closeConnection(false);
         }
-        myDatabase.closeConnection(true);
     }
 
     public AuthToken getUserToken() {

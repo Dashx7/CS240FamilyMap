@@ -21,6 +21,7 @@ public class ClearResult {
         this.success = success;
     }
 
+
     String message = "Not initialized";
     boolean success = false;
     /**
@@ -37,7 +38,7 @@ public class ClearResult {
         success = false;
     }
     public void error(){
-        message = "Not specified";
+        message = "Error: Not specified";
         success = false;
     }
 }

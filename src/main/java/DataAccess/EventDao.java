@@ -91,13 +91,13 @@ public class EventDao {
         }
 
     }
-    public Event[] findAll(String attribute, String type) throws DataAccessException {
+    public ArrayList<Event> findAll(String attribute, String type) throws DataAccessException {
         if(type == ""){
             type = "eventID"; //default to eventID
             //associatedUsername
         }
         Event event;
-        List<Event> events = new ArrayList<>();
+        ArrayList<Event> events = new ArrayList<>();
         ResultSet rs;
         String sql = "SELECT * FROM Event WHERE " + type + " = ?;";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -110,7 +110,7 @@ public class EventDao {
                         rs.getInt("Year"));
                 events.add(event);
             }
-            return events.toArray(new Event[0]);
+            return events;
         } catch (SQLException e) {
             e.printStackTrace();
             throw new DataAccessException("Error encountered while finding an event in the database");

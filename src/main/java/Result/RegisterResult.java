@@ -1,14 +1,11 @@
 package Result;
 
-import Model.AuthToken;
-import Request.RegisterRequest;
-
 /**
  * For registration handling result
  */
 public class RegisterResult {
     String message;
-    String authToken;
+    String authtoken;
     String username;
     String personID;
 
@@ -26,18 +23,13 @@ public class RegisterResult {
      */
     public RegisterResult(){
     }
-//    public RegisterResult(RegisterRequest myRequest){
-//        //setUserAuthToken(myRequest.);
-//        this.username = myRequest.getUsername();
-//        this.personID = my
-//    }
 
-    public String getAuthToken() {
-        return authToken;
+    public String getAuthtoken() {
+        return authtoken;
     }
 
-    public void setAuthToken(String authToken) {
-        this.authToken = authToken;
+    public void setAuthtoken(String authtoken) {
+        this.authtoken = authtoken;
     }
 
     public String getUsername() {

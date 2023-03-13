@@ -7,7 +7,6 @@ import DataAccess.DataAccessException;
 import Result.FillResults;
 import Service.FillService;
 import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
 import com.sun.net.httpserver.*;
 
 
@@ -18,7 +17,6 @@ public class FillHandler implements HttpHandler {
         try {
             // post request
             if (exchange.getRequestMethod().equalsIgnoreCase("post")) {
-
                 // Get the request body input stream
                 InputStream reqBody = exchange.getRequestBody();
 
@@ -27,6 +25,7 @@ public class FillHandler implements HttpHandler {
 
                 // Display/log the request JSON data
                 System.out.println(reqData);
+
                 String httpURI = exchange.getRequestURI().toString();
                 String[] parts = httpURI.split("/");
                 int numParts = parts.length;
@@ -39,24 +38,19 @@ public class FillHandler implements HttpHandler {
                 }
                 String username = (parts[2]);
                 FillResults result = new FillResults();
-                    try{
-                        FillService service = new FillService(username, numGenerations);
-                        result = service.getMyResults();
-                        if(result.isSuccess()){
-                            exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
-                        }
-                        else{
-                            exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
-                        }
-                        Writer resBody = new OutputStreamWriter(exchange.getResponseBody());
-                        Gson gson = new Gson();
-                        gson.toJson(result, resBody);
-                        resBody.close();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    } catch (JsonIOException e) {
-                        throw new RuntimeException(e);
-                    }
+
+                FillService service = new FillService(username, numGenerations);
+                result = service.getMyResults();
+                if (result.isSuccess()) {
+                    exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
+                } else {
+                    exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
+                }
+                Writer resBody = new OutputStreamWriter(exchange.getResponseBody());
+                Gson gson = new Gson();
+                gson.toJson(result, resBody);
+                resBody.close();
+
             }
         } catch (IOException e) {
             // Some kind of internal error has occurred inside the server (not the
