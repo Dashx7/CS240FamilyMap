@@ -1,6 +1,7 @@
 package ServiceTests;
 
         import Request.LoadRequest;
+        import Result.LoadResult;
         import Service.ClearService;
         import Service.FillService;
         import Service.LoadService;
@@ -26,28 +27,30 @@ package ServiceTests;
 
         @Test
         public void fill() {
-            LoginService newLogin = new LoginService();
-            Gson gson = new Gson();
-            LoadRequest loadRequest = new LoadRequest();
-
-            LoadService myLoadService = new LoadService();
-            FillService myFillService = new FillService("username",4);
-        }
-
-        @Test
-        public void clearPositive2() {
             Gson gson = new Gson();
             loadData newLoad = new loadData();
             LoadRequest request = (LoadRequest) gson.fromJson(newLoad.getLoad(), LoadRequest.class);
+            LoadService service = new LoadService(request);
+            LoadResult result = service.getMyResult();
+            assertTrue(result.isSuccess());
 
-            FillService myFillService = new FillService("username",4);
-            //assertTrue();
+            FillService myFillService = new FillService("aaronstarky",4);
+            assertTrue(myFillService.getMyResults().isSuccess());
+
         }
 
         @Test
-        public void clearNegative(){
-            ClearService myClearService = new ClearService();
-            assertNotNull(myClearService.getMyResults());
+        public void negative() {
+            Gson gson = new Gson();
+            loadData newLoad = new loadData();
+            LoadRequest request = (LoadRequest) gson.fromJson(newLoad.getLoad(), LoadRequest.class);
+            LoadService service = new LoadService(request);
+            LoadResult result = service.getMyResult();
+            assertTrue(result.isSuccess());
+
+            FillService myFillService = new FillService("aaronstarkyFAILED",4);
+            assertFalse(myFillService.getMyResults().isSuccess());
+            assertTrue(myFillService.getMyResults().getMessage().contains("Error"));
 
         }
     }

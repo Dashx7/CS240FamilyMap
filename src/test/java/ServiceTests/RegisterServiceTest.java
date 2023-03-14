@@ -1,7 +1,11 @@
 package ServiceTests;
 
+import Model.Person;
+import Request.RegisterRequest;
 import Service.ClearService;
 import Service.LoginService;
+import Service.RegisterService;
+import com.google.gson.Gson;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,17 +25,21 @@ import static org.junit.jupiter.api.Assertions.*;
         }
 
         @Test
-        public void clearPositive() {
-            //LoginService newLogin = new LoginService();
-            ClearService myClearService = new ClearService();
-            assertTrue(myClearService.getMyResults().isSuccess());
+        public void registerPositive() {
+            loadData newData = new loadData();
+            Gson gson = new Gson();
+            RegisterRequest myRegisterRequest = gson.fromJson(newData.getRegister(),RegisterRequest.class);
+            RegisterService newRegisterService = new RegisterService(myRegisterRequest);
+            assertTrue(newRegisterService.getMyResult().isSuccess());
         }
 
         @Test
-        public void clearNegative(){
-            ClearService myClearService = new ClearService();
-            assertNotNull(myClearService.getMyResults());
-
+        public void registerNegative(){
+            loadData newData = new loadData();
+            Gson gson = new Gson();
+            RegisterRequest myRegisterRequest = gson.fromJson(newData.getRegisterBad(),RegisterRequest.class);
+            RegisterService newRegisterService = new RegisterService(myRegisterRequest);
+            assertFalse(newRegisterService.getMyResult().isSuccess());
         }
     }
 

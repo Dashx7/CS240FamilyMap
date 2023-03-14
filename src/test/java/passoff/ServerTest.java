@@ -1,6 +1,5 @@
 package passoff;
 
-import Service.ClearService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
@@ -137,7 +136,6 @@ public class ServerTest {
         try {
             //We are calling the register api for a user named sheila
             RegisterResult registerResult = proxy.register(host, port, registerRequest);
-
             //Checks to see if registerResult has an authtoken String
             assertNotNull(registerResult.getAuthtoken(), "authtoken was null OR its variable name did not match that of the expected JSon (see API)");
             //Checks to see if you filled registerResult with an authtoken String
@@ -934,6 +932,7 @@ public class ServerTest {
         //You may need to follow the steps under the heading "Setting up for the Persistence Test" in the "How To Get Started"
         //tutorial, linked in canvas, in order to get this to work properly. The "How to Get Started" tutorial can be found
         //inside the Family Map Server Program assignment listed on the Assignments tab on canvas.
+        //TODO ADD BACK
         //scanner.nextLine();
         try {
             //We are creating a JsonReader from the LoadData.json file

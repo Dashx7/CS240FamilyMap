@@ -3,6 +3,7 @@ package ServiceTests;
         import Request.LoadRequest;
         import Result.LoadResult;
         import Service.ClearService;
+        import Service.FillService;
         import Service.LoadService;
         import Service.LoginService;
         import com.google.gson.Gson;
@@ -29,6 +30,9 @@ public class LoadServiceTest {
 
     @Test
     public void loadPositive() {
+        Gson gson = new Gson();
+        loadData newLoad = new loadData();
+        LoadRequest request = (LoadRequest) gson.fromJson(newLoad.getLoad(), LoadRequest.class);
         LoadService service = new LoadService(request);
         LoadResult result = service.getMyResult();
         assertTrue(result.isSuccess());
@@ -36,10 +40,12 @@ public class LoadServiceTest {
 
     @Test
     public void loadNegative(){
+        Gson gson = new Gson();
+        loadData newLoad = new loadData();
+        LoadRequest request = (LoadRequest) gson.fromJson(newLoad.getLoad(), LoadRequest.class);
         LoadService service = new LoadService(request);
         LoadResult result = service.getMyResult();
         assertFalse(result.getMessage().contains("Error"));
-
     }
 }
 

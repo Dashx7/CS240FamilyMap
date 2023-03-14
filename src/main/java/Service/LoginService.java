@@ -22,12 +22,6 @@ public class LoginService {
     private LoginResult myResult = new LoginResult();
 
     /**
-     * The wonderful default constructor, don't use
-     */
-    public LoginService() {
-    }
-
-    /**
      * Logs you in baby
      */
     public LoginService(LoginRequest myRequest) throws DataAccessException {
@@ -48,13 +42,14 @@ public class LoginService {
                 userToken = myAuthTokenDao.find(myRequest.getUsername(), "username");
                 if (userToken == null) {
                     //If the user exists but not the authtoken we make the authtoken... probably
-                    myAuthTokenDao.insert(new AuthToken(UUID.randomUUID().toString().substring(0, 8), myRequest.getUsername()));
+                    userToken = new AuthToken(UUID.randomUUID().toString().substring(0, 8), myRequest.getUsername());
+                    myAuthTokenDao.insert(userToken);
                 }
                 //Setting the results when things worked
                 myResult.setSuccess(true);
                 myResult.setUsername(myRequest.getUsername());
                 myResult.setPersonID(myUser.getPersonID());
-                myResult.setAuthtoken(myAuthTokenDao.find(myRequest.getUsername(),"username").getAuthToken());
+                myResult.setAuthtoken(userToken.getAuthToken());
                 myDatabase.closeConnection(true);
             }
             else {

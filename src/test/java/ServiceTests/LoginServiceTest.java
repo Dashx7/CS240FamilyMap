@@ -1,7 +1,14 @@
 package ServiceTests;
 
+import DataAccess.DataAccessException;
+import Request.LoadRequest;
+import Request.LoginRequest;
+import Result.LoadResult;
 import Service.ClearService;
+import Service.FillService;
+import Service.LoadService;
 import Service.LoginService;
+import com.google.gson.Gson;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,17 +28,39 @@ import static org.junit.jupiter.api.Assertions.*;
         }
 
         @Test
-        public void clearPositive() {
-            //LoginService newLogin = new LoginService();
-            ClearService myClearService = new ClearService();
-            assertTrue(myClearService.getMyResults().isSuccess());
+        public void LoginPositive() {
+            Gson gson = new Gson();
+            loadData newLoad = new loadData();
+            LoadRequest request = (LoadRequest) gson.fromJson(newLoad.getLoad(), LoadRequest.class);
+            LoadService service = new LoadService(request);
+            LoadResult result = service.getMyResult();
+            assertTrue(result.isSuccess());
+
+            LoginRequest myLoginRequest = gson.fromJson(newLoad.getLogin1(),LoginRequest.class);
+            LoginService myLoginService;
+            try {
+                myLoginService = new LoginService(myLoginRequest);
+            } catch (DataAccessException e) {
+                fail();
+            }
         }
 
         @Test
-        public void clearNegative(){
-            ClearService myClearService = new ClearService();
-            assertNotNull(myClearService.getMyResults());
+        public void loginNegative(){
+            Gson gson = new Gson();
+            loadData newLoad = new loadData();
+            LoadRequest request = (LoadRequest) gson.fromJson(newLoad.getLoad(), LoadRequest.class);
+            LoadService service = new LoadService(request);
+            LoadResult result = service.getMyResult();
+            assertTrue(result.isSuccess());
 
+            LoginRequest myLoginRequest = gson.fromJson(newLoad.getLogin1(),LoginRequest.class);
+            LoginService myLoginService;
+            try {
+                myLoginService = new LoginService(myLoginRequest);
+            } catch (DataAccessException e) {
+                fail();
+            }
         }
     }
 

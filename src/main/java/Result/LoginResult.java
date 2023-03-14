@@ -10,8 +10,6 @@ import Request.LoginRequest;
 public class LoginResult {
     String message;
     boolean success;
-    //apparently I'm dumb
-    //AuthToken myAuthtoken;
     String authtoken;
     String username;
     String personID;

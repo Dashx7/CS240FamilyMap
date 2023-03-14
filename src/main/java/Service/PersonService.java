@@ -75,8 +75,6 @@ public class PersonService {
             myPersonDao = new PersonDao(myConnection);
 
             myAuthToken = theAuthToken;
-            //Create the person from finding it in the database using its name
-            //singularPerson = myPersonDao.find(personIDToFind);
             Person toFind = myPersonDao.find(personIDToFind); //ForID
             if(toFind!=null){
                 result.setSuccess(true);

@@ -16,23 +16,13 @@ public class ClearHandler implements HttpHandler {
         try {
             // Determine the HTTP request type (GET, POST, etc.).
             if (exchange.getRequestMethod().toLowerCase().equals("post")) { //Yep
-
-
-                // Get the HTTP request headers
-                Headers reqHeaders = exchange.getRequestHeaders();
-                // Extract the JSON string from the HTTP request body
-
                 // Get the request body input stream
                 InputStream reqBody = exchange.getRequestBody();
-
                 // Read JSON string from the input stream
                 String reqData = readString(reqBody);
 
                 // Display/log the request JSON data
                 System.out.println(reqData);
-
-
-                //LoginRequest request = (LoginRequest) gson.fromJson(reqData, LoginRequest.class);
 
                 //Actually Clearing things
                 ClearService service = new ClearService();
@@ -48,8 +38,6 @@ public class ClearHandler implements HttpHandler {
                 Gson gson = new Gson();
                 gson.toJson(result, resBody); //Writes it to the resBody
                 resBody.close();
-                success = true;
-
             }
         } catch (IOException e) {
             // Some kind of internal error has occurred inside the server (not the

@@ -4,12 +4,12 @@ package Result;
  * For registration handling result
  */
 public class RegisterResult {
-    String message;
     String authtoken;
     String username;
+    String message;
     String personID;
-
     boolean success;
+
     public boolean isSuccess() {
         return success;
     }

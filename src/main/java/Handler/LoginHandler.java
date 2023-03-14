@@ -18,7 +18,6 @@ public class LoginHandler implements HttpHandler {
         try {
             // This HTTPS request is a post
             if (exchange.getRequestMethod().equalsIgnoreCase("post")) {
-
                 // Get the request body input stream
                 InputStream reqBody = exchange.getRequestBody();
 
@@ -32,7 +31,6 @@ public class LoginHandler implements HttpHandler {
                 LoginRequest request = (LoginRequest) gson.fromJson(reqData, LoginRequest.class);
                 LoginService myLoginService = new LoginService(request);
                 LoginResult result = myLoginService.getMyResult();
-                //result.s(myLoginService.getUserToken());
 
                 if(result.isSuccess()){
                     exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);

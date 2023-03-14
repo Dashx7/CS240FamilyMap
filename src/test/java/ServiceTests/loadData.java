@@ -43,4 +43,34 @@ public class loadData {
     public String getLoad() {
         return load;
     }
+    String login1 = "{\n" +
+            "\t\"username\":\"aaronstarky\",\n" +
+            "\t\"password\":\"yikers\"\n" +
+            "}";
+
+    public String getLogin1() {
+        return login1;
+    }
+    String register = "{\n" +
+            "\t\"username\":\"username\",\n" +
+            "\t\"password\":\"password\",\n" +
+            "\t\"email\":\"email\",\n" +
+            "\t\"firstName\":\"firstname\",\n" +
+            "\t\"lastName\":\"lastname\",\n" +
+            "\t\"gender\":\"m\"\n" +
+            "}";
+    public String getRegister(){
+        return register;
+    }
+    String registerBad = "{\n" +
+            "\t\"username\":\"username\",\n" +
+            "\t\"password\":\"password\",\n" +
+            "\t\"email\":\"email\",\n" +
+            "\t\"firstName\":\"firstname\",\n" +
+            "\t\"lastName\":\"lastname\",\n" +
+            "\t\"gender\":\"adfgdafg\"\n" +
+            "}";
+    public String getRegisterBad(){
+        return registerBad;
+    }
 }

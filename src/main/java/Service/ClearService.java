@@ -45,7 +45,7 @@ public class ClearService {
         catch (DataAccessException e) {
             myResults.error("Error: It failed dataAccessException");
             myDatabase.closeConnection(false);
-            throw new RuntimeException(e);
+            //throw new RuntimeException(e);
         }
     }
 
