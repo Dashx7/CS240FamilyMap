@@ -46,9 +46,9 @@ public class FillService {
     User theUser;
 
     //Little rough in my generation I know
-    int MINMARRIAGEAGE = 13, MINPARENTAGE = 13;
-    int MAXMARRIAGEAGE = 50, MAXPARENTAGE = 50, MINDEATHAGE = 50;
-    int MAXMARRIAGETODEATH = 70;
+    int MINMARRIAGEAGE = 14, MINPARENTAGE = 14;
+    int MAXMARRIAGEAGE = 49, MAXPARENTAGE = 49, MINDEATHAGE = 49;
+    int MAXMARRIAGETODEATH = 69;
     int CURRENTYEAR = 2023;
     int totalEvents = 0, totalPeople = 0;
     /**
@@ -61,6 +61,7 @@ public class FillService {
             this.generations = generations;
 
             //Opening the database and the Dao connections
+            myDatabase.openConnection();
             Connection myConnection = myDatabase.getConnection();
             myPersonDao = new PersonDao(myConnection);
             myUserDao = new UserDao(myConnection);
@@ -82,8 +83,8 @@ public class FillService {
                 String userBirthID = CreateEvent("birth", theUser.getPersonID(), CURRENTYEAR);
 
                 //Start generation
-                generateTree(generations, thePerson, userBirthID);
-                //myPersonDao.insert(thePerson);
+                generateTree(generations, thePerson, userBirthID, theUser);
+
 
                 myResults.success();
                 totalEvents+=1;
@@ -102,7 +103,7 @@ public class FillService {
         }
     }
 
-    public void generateTree(int generations, Person child, String childBirthID) throws DataAccessException {
+    public void generateTree(int generations, Person child, String childBirthID, User theUser) throws DataAccessException {
         Random myRand = new Random();
         int alterAmount;
         int childBirth = myEventDao.find(childBirthID).getYear();;
@@ -115,7 +116,7 @@ public class FillService {
             Person mother = generatePerson("f");
             mother.setAssociatedUsername(child.getAssociatedUsername());
             child.setMotherID(mother.getPersonID());
-            alterAmount = Math.abs(myRand.nextInt())%(MAXPARENTAGE-MINPARENTAGE)+MINPARENTAGE; //13-50 alter
+            alterAmount = (Math.abs(myRand.nextInt())%(MAXPARENTAGE-MINPARENTAGE))+MINPARENTAGE; //13-50 alter
             int motherBornYear = childBirth - alterAmount;
             String motherBornEventID = CreateEvent("birth", mother.getPersonID(),motherBornYear);// Birth mother
 
@@ -123,10 +124,15 @@ public class FillService {
             Person father = generatePerson("m");
             father.setAssociatedUsername(child.getAssociatedUsername());
             child.setFatherID(father.getPersonID());
-            alterAmount = Math.abs(myRand.nextInt())%(MAXPARENTAGE-MINPARENTAGE)+MINPARENTAGE; //13-50 alter
+            alterAmount = (Math.abs(myRand.nextInt())%(MAXPARENTAGE-MINPARENTAGE))+MINPARENTAGE; //13-50 alter
             int fatherBornYear = childBirth - alterAmount;
             String fatherBornEventID = CreateEvent("birth", father.getPersonID(),fatherBornYear); //Birth father
 
+            if(theUser!=null){ //Base case
+                child.setPersonID(theUser.getPersonID());
+                child.setFirsName(theUser.getFirstName());
+                child.setLastName(theUser.getLastName());
+            }
             myPersonDao.insert(child); // Inserting child before new generation and after mother/father ID is set
 
             //They married now
@@ -136,25 +142,27 @@ public class FillService {
             Random myRandom = new Random();
             int randIndex = Math.abs(myRandom.nextInt())% myLocationData.getData().length;
             Location myLocation = myLocationData.getData()[randIndex]; //rand location
+
             int positive = Math.abs(myRand.nextInt());
-            alterAmount = positive%(MAXMARRIAGEAGE-MINMARRIAGEAGE)+MINMARRIAGEAGE; //13-50 alter
-            int marriageYear = childBirth-alterAmount;
+            alterAmount = (positive%(MAXMARRIAGEAGE-MINMARRIAGEAGE))+MINMARRIAGEAGE; //13-50 alter
+            int marriageYear = childBirth+alterAmount;
 
             String MarriageEventID = CreateEvent("marriage", father.getPersonID(),marriageYear,myLocation);
             CreateEvent("marriage", father.getPersonID(),marriageYear ,myLocation);
+            CreateEvent("marriage", mother.getPersonID(),marriageYear ,myLocation);
 
             //Kill them
-            alterAmount = Math.abs(myRand.nextInt())%(MAXMARRIAGETODEATH)+MINDEATHAGE; //50-120 alter
+            alterAmount = (Math.abs(myRand.nextInt())%(MAXMARRIAGETODEATH))+MINDEATHAGE; //50-120 alter
             int fatherDeathYear = fatherBornYear + alterAmount;
-            alterAmount = Math.abs(myRand.nextInt())%(MAXMARRIAGETODEATH)+MINDEATHAGE; //50-120 alter
+            alterAmount = (Math.abs(myRand.nextInt())%(MAXMARRIAGETODEATH))+MINDEATHAGE; //50-120 alter
             int motherDeathYear = motherBornYear + alterAmount;
             CreateEvent("death",father.getPersonID(),fatherDeathYear);
             CreateEvent("death",mother.getPersonID(),motherDeathYear);
 
 
             //Generate next generation
-            generateTree(generations-1,mother,motherBornEventID);
-            generateTree(generations-1,father,fatherBornEventID);
+            generateTree(generations-1,mother,motherBornEventID, null);
+            generateTree(generations-1,father,fatherBornEventID, null);
         }
         else{
             myPersonDao.insert(child); // Inserting the last gen
@@ -208,21 +216,6 @@ public class FillService {
         return event.getEventID();
     }
 
-
-//    /**
-//     * for each of the people in the family tree
-//     * @throws DataAccessException
-//     */
-//    public void generateEvents() throws DataAccessException{
-//        for (Person thePerson : familyList) {
-//            EventService myEventService = new EventService();
-//            myEventService.EventServiceSingular(thePerson.getAssociatedUsername(), "");
-//            for(Event myEvent: myEventService.getListOfEventsFinal()){
-//                events.add(myEvent);
-//            }
-//        }
-//    }
-
     //Turing a filepath into a object
     private Object make(String filePath, Class theClass) throws FileNotFoundException {
         File file = new File(filePath);
@@ -230,7 +223,7 @@ public class FillService {
         Object myO = gson.fromJson(myFileReader,theClass);
         return myO;
     }
-    //Initializing all of the Json file I need
+    //Initializing all the Json file I need
     private void intilizeJson() {
         try {
             myFnames = (Fnames) make("src/main/java/json/fnames.json", Fnames.class);

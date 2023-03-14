@@ -45,7 +45,7 @@ public class PersonResult {
     }
 
     public void setData(ArrayList<Person> data) {
-        this. data = new ArrayList<>();
+        this.data = new ArrayList<>();
         this.data = data;
     }
 

@@ -4,15 +4,15 @@ import Model.Event;
 import Request.EventRequest;
 
 import java.util.ArrayList;
-
 /**
  * Results of the events
  */
 public class EventResult {
 
+
+    ArrayList<Event> data;
     String message; //Message only when it fails
     boolean success;
-    ArrayList<Event> data;
 
     private String eventID;
     private String associatedUsername;
@@ -61,11 +61,18 @@ public class EventResult {
     public ArrayList<Event> getEventList() {
         return data;
     }
+    public Event getEvent() {
+        if(!data.isEmpty()){
+            return data.get(0);
+        }
+        else return null;
+    }
 
     public void setEventList(ArrayList<Event> eventList) {
         this.data = new ArrayList<>();
         this.data = eventList;
     }
+
 
     /**
      * The wonderful default constructor

@@ -13,6 +13,7 @@ import client.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -948,6 +949,9 @@ public class ServerTest {
             //Checks to see if the list of events associated with sheila from loadRequest matches the list of events from eventsResult
             assertEquals(loadRequest.getEvents(loginRequest.getUsername()), eventsResult.getDataAsSet(), SHEILA.getUsername() + "'s events do not match those loaded");
             //Checks to see if the list of people associated with sheila from loadRequest matches the list of people from personsResult
+
+            Set<Person> test = personsResult.getDataAsSet();
+            Set<Person> test2 = loadRequest.getPersons(loginRequest.getUsername());
             assertEquals(loadRequest.getPersons(loginRequest.getUsername()), personsResult.getDataAsSet(), SHEILA.getUsername() + "'s persons do not match those loaded");
             //We are calling the login api for a user named patrick
             loginResult = proxy.login(host, port, loginRequest2);

@@ -28,7 +28,7 @@ public class LoginService {
         try {
             //Opening the database and the Dao connections
             myDatabase = new Database();
-            //myDatabase.openConnection();
+            myDatabase.openConnection();
             Connection myConnection = myDatabase.getConnection();
             myUserDao = new UserDao(myConnection);
             myAuthTokenDao = new AuthTokenDao(myConnection);
@@ -39,18 +39,24 @@ public class LoginService {
                 throw new DataAccessException("Username does not exist");
             }
             else if (myUser.getPassword() == myRequest.getPassword() || myUser.getPassword().compareTo(myRequest.getPassword()) == 0) {
-                userToken = myAuthTokenDao.find(myRequest.getUsername(), "username");
-                if (userToken == null) {
-                    //If the user exists but not the authtoken we make the authtoken... probably
-                    userToken = new AuthToken(UUID.randomUUID().toString().substring(0, 8), myRequest.getUsername());
-                    myAuthTokenDao.insert(userToken);
+                if(myUser.getUsername().compareTo(myRequest.getUsername())==0){
+                    userToken = myAuthTokenDao.find(myRequest.getUsername(), "username");
+
+                    if (userToken == null) {
+                        //If the user exists but not the authtoken we make the authtoken... probably
+                        userToken = new AuthToken(UUID.randomUUID().toString().substring(0, 8), myRequest.getUsername());
+                        myAuthTokenDao.insert(userToken);
+                    }
+                    //Setting the results when things worked
+                    myResult.setSuccess(true);
+                    myResult.setUsername(myRequest.getUsername());
+                    myResult.setPersonID(myUser.getPersonID());
+                    myResult.setAuthtoken(userToken.getAuthToken());
+                    myDatabase.closeConnection(true);
                 }
-                //Setting the results when things worked
-                myResult.setSuccess(true);
-                myResult.setUsername(myRequest.getUsername());
-                myResult.setPersonID(myUser.getPersonID());
-                myResult.setAuthtoken(userToken.getAuthToken());
-                myDatabase.closeConnection(true);
+                else{
+                    throw new DataAccessException("Error: Username not associated with authtoken");
+                }
             }
             else {
                 throw new DataAccessException("Username and password do not match");

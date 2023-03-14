@@ -20,10 +20,8 @@ public class EventService {
     /**
      * The wonderful default constructor
      */
-    private EventDao myEventDao;
-    Database myDatabase= new Database();;
-    private PersonService myPersonService;
-    Event singularEvent;
+    Database myDatabase= new Database();
+    Event singularEvent = new Event();
     ArrayList<Event> listOfEvents = new ArrayList<>();
     EventResult myResult = new EventResult();
 
@@ -32,31 +30,31 @@ public class EventService {
         try {
             //Opening the database and the Dao connections
             myDatabase.openConnection();
-            Connection myConnection = myDatabase.getConnection();
-            myEventDao = new EventDao(myConnection);
+            EventDao myEventDao = new EventDao(myDatabase.getConnection());
 
             //Find all events associated with the authtoken's username and set them to my result
             listOfEvents = myEventDao.findAll(theAuthToken.getUserName(), "associatedUsername");
+            myDatabase.closeConnection(true);
+
             myResult.setEventList(listOfEvents);
             myResult.setSuccess(true);
-            myDatabase.closeConnection(true);
+
 
         } catch (DataAccessException e) {
             myResult.setSuccess(false);
             myResult.setMessage("Error, failed to connect because" + e.toString());
-            myDatabase.closeConnection(false);
         }
     }
 
     public void EventServiceSingular(String username, String EventID) {
         try {
             //Opening the database and the Dao connections
-            myDatabase = new Database();
             myDatabase.openConnection();
-            Connection myConnection = myDatabase.getConnection();
-            myEventDao = new EventDao(myConnection);
+            EventDao myEventDao = new EventDao(myDatabase.getConnection());
 
             Event theEvent = myEventDao.find(EventID, "eventID");
+            myDatabase.closeConnection(true);
+
             //String a1 = theEvent.getAssociatedUsername().toString().toLowerCase();
             //String userName = username.toString().toLowerCase();
             if(theEvent==null){
@@ -65,14 +63,12 @@ public class EventService {
             else if (theEvent.getAssociatedUsername().compareToIgnoreCase(username)==0) { //Matches the username and puts it in the result
                 myResult.setSuccess(true);
                 myResult.setSingularEvent(theEvent);
-                myDatabase.closeConnection(true);
             } else {
                 throw new DataAccessException("Error, event not associated with your authtoken username");
             }
         } catch (DataAccessException e) {
             myResult.setSuccess(false);
             myResult.setMessage("Error, failed to connect because" + e.toString() + ", " + e.returnMessage());
-            myDatabase.closeConnection(false);
         }
     }
 

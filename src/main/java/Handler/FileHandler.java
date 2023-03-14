@@ -61,20 +61,17 @@ public class FileHandler implements HttpHandler {
                     exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
                     Files.copy(myFile.toPath(),respBody); //You have to copy after you send it
 
-//                // We are not sending a response body, so close the response body
-//                // output stream, indicating that the response is complete.
                     exchange.getResponseBody().close();
 
-                    success = true;
                 }
                 else{
                     myFile =  new File("web/HTML/404.html");
+                    OutputStream respBody = exchange.getResponseBody();
+                    exchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, 0);
+                    Files.copy(myFile.toPath(),respBody); //You have to copy after you send it
+                    // The HTTP request was invalid somehow, so we return a "bad request"
+                    exchange.getResponseBody().close();
                 }
-            }
-            if (!success) {
-                // The HTTP request was invalid somehow, so we return a "bad request"
-                exchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND, 0);
-                exchange.getResponseBody().close();
             }
         } catch (IOException e) {
             // Some kind of internal error has occurred inside the server (not the

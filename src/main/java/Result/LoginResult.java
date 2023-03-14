@@ -62,10 +62,6 @@ public class LoginResult {
 //        this.myAuthtoken = myAuthtoken;
 //    }
 
-    public void success(){
-       setMessage("Successfully Logged in");
-       setSuccess(true);
-    }
     public void fail(DataAccessException e){
         setMessage("Error: Failed due to :" + e.toString() + "," + e.returnMessage());
         setSuccess(false);

@@ -28,6 +28,7 @@ public class ClearService {
         Database myDatabase = new Database();;
         try{
             //Opening the database and the Dao connections
+            myDatabase.openConnection();
             Connection myConnection = myDatabase.getConnection();
             myAuthTokenDao = new AuthTokenDao(myConnection);
             myAuthTokenDao.clear();

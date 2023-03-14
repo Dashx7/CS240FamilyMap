@@ -1,8 +1,10 @@
 package DataAccess;
 
+import Model.Event;
 import Model.Person;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * Data access
@@ -90,7 +92,32 @@ public class PersonDao {
             throw new DataAccessException("Error encountered while finding an person in the database");
         }
     }
-
+    public ArrayList<Person> findAll(String associatedUsername) throws DataAccessException {
+        Person person;
+        ArrayList<Person> people = new ArrayList<>();
+        ResultSet rs;
+        String sql = "SELECT * FROM Person WHERE associatedUsername = ?;";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, associatedUsername);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                person = new Person();
+                person.setPersonID(rs.getString("personID"));
+                person.setAssociatedUsername(rs.getString("associatedUsername"));
+                person.setFirsName(rs.getString("firstName"));
+                person.setLastName(rs.getString("lastName"));
+                person.setGender(rs.getString("gender"));
+                person.setFatherID(rs.getString("fatherID"));
+                person.setMotherID(rs.getString("motherID"));
+                person.setSpouseID(rs.getString("spouseID"));
+                people.add(person);
+            }
+            return people;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new DataAccessException("Error encountered while finding an person in the database");
+        }
+    }
     public void clear() throws DataAccessException {
         String sql = "DELETE FROM Person";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {

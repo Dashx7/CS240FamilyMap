@@ -25,7 +25,7 @@ public class PersonService {
     Database myDatabase = new Database();
     private PersonDao myPersonDao;
     private AuthTokenDao myAuthtokenDao;
-    private AuthToken myAuthToken;
+    AuthToken myAuthToken;
     Person singularPerson;
     ArrayList<Person> listOfPeople = new ArrayList<>();
 
@@ -34,22 +34,28 @@ public class PersonService {
 
     public PersonService(AuthToken theAuthToken) throws DataAccessException {
         try {
+            myAuthToken = theAuthToken;
             result = new PersonResult();
+
             //Opening the database and the Dao connections
             myDatabase.openConnection();
-            Connection myConnection = myDatabase.getConnection();
-            myPersonDao = new PersonDao(myConnection);
-            myAuthtokenDao = new AuthTokenDao(myConnection);
+            myPersonDao = new PersonDao(myDatabase.getConnection());
+            myAuthtokenDao = new AuthTokenDao(myDatabase.getConnection());
 
-            myAuthToken = theAuthToken;
             //Create the person from finding it in the database using its name
             singularPerson = myPersonDao.find(myAuthToken.getUserName(),"");
+            myDatabase.closeConnection(true); //Close it immediately after Dao use
+
             if (singularPerson != null) {
-                generateAllRelatives(singularPerson);
+                myDatabase.openConnection();
+                myPersonDao = new PersonDao(myDatabase.getConnection());
+                listOfPeople = myPersonDao.findAll(myAuthToken.getUserName()); //FIXME ?
+                myDatabase.closeConnection(true);
+//                listOfPeople.add(singularPerson); //Add in the base person
+//                generateAllRelatives(singularPerson);
                 result.setSuccess(true);
                 result.setData(listOfPeople);
 
-                myDatabase.closeConnection(true);
             } else {
                 if (myAuthtokenDao.find(myAuthToken.getAuthToken()) == null) {
                     throw new DataAccessException("Error: Not a valid authtoken");
@@ -61,7 +67,6 @@ public class PersonService {
         } catch (DataAccessException e) {
             result.setMessage("Error: " + e + ", " + e.returnMessage());
             result.setSuccess(false);
-            myDatabase.closeConnection(false);
         }
     }
 
@@ -71,15 +76,26 @@ public class PersonService {
             //Opening the database and the Dao connections
             Database myDatabase = new Database();
             myDatabase.openConnection();
-            Connection myConnection = myDatabase.getConnection();
-            myPersonDao = new PersonDao(myConnection);
+            myPersonDao = new PersonDao(myDatabase.getConnection());
 
-            myAuthToken = theAuthToken;
+            //myAuthToken = theAuthToken;
             Person toFind = myPersonDao.find(personIDToFind); //ForID
+            myDatabase.closeConnection(true);
+
             if(toFind!=null){
-                result.setSuccess(true);
-                result.setSingularPerson(toFind);
-                myDatabase.closeConnection(false);
+                myDatabase.openConnection(); //Opening
+                EventDao myEventDao = new EventDao(myDatabase.getConnection());
+                String associatedUsername = myEventDao.find(toFind.getAssociatedUsername(), "associatedUsername").getAssociatedUsername(); //Grabbing who the event of the authtoken is realted to
+                myDatabase.closeConnection(true); //Close immediately after
+
+                if(associatedUsername.compareToIgnoreCase(theAuthToken.getUserName())==0){
+                    result.setSuccess(true);
+                    result.setSingularPerson(toFind);
+                }
+                else{
+                    throw new DataAccessException("Error: Authtoken and username exist but aren't assoicated");
+                }
+
             }
             else {
                 throw new DataAccessException("Error, could not find person with that ID");
@@ -88,24 +104,27 @@ public class PersonService {
         } catch (DataAccessException e) {
             result.setMessage("Failed because: " + e.toString() + ", " + e.returnMessage());
             result.setSuccess(false);
-            myDatabase.closeConnection(false);
+            System.out.println(result.toString());
         }
     }
 
-    private void generateAllRelatives(Person person) throws DataAccessException {
-        //If they have a parent add them to the list of people and then generate it for them
-        Person dad = myPersonDao.find(person.getFatherID()); //Finding dad //For ID
-        if (dad != null) { //If he exists, regenerate with him in the list
-            listOfPeople.add(dad);
-            generateAllRelatives(dad);
-        }
-
-        Person mom = myPersonDao.find(person.getMotherID()); //Finding mom //For ID
-        if (mom != null) {//If she exists, regenerate with her in the list
-            listOfPeople.add(mom);
-            generateAllRelatives(mom);
-        }
-    }
+//    private void generateAllRelatives(Person person) throws DataAccessException {
+//        myDatabase.openConnection();
+//        myPersonDao = new PersonDao(myDatabase.getConnection());
+//        //If they have a parent add them to the list of people and then generate it for them
+//        Person dad = myPersonDao.find(person.getFatherID()); //Finding dad //For ID
+//        Person mom = myPersonDao.find(person.getMotherID()); //Finding mom //For ID
+//        myDatabase.closeConnection(true); //Close it immediately afterwards
+//
+//        if (dad != null) { //If he exists, regenerate with him in the list
+//            listOfPeople.add(dad);
+//            generateAllRelatives(dad);
+//        }
+//        if (mom != null) {//If she exists, regenerate with her in the list
+//            listOfPeople.add(mom);
+//            generateAllRelatives(mom);
+//        }
+//    }
 
     public Person getSingularPerson() {
         return singularPerson;

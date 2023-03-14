@@ -69,7 +69,7 @@ public class EventHandler implements HttpHandler {
                         }
                         result = myEventService.getMyResult();
 
-                        //Returning a success
+                        //Returning results
                         if (result.isSuccess()) {
                             exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK, 0);
                         } else {
@@ -91,7 +91,7 @@ public class EventHandler implements HttpHandler {
                     Gson gson = new Gson();
                     gson.toJson(result, resBody);
                     resBody.close();
-                }
+               }
             }
         }
     }
