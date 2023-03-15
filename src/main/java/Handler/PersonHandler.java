@@ -13,7 +13,7 @@ import Service.PersonService;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.*;
 
-public class PersonHandler implements HttpHandler {
+public class PersonHandler extends Handler implements HttpHandler {
     String personID;
     PersonResult result;
     Database myDatabase = new Database();
@@ -123,19 +123,4 @@ public class PersonHandler implements HttpHandler {
         gson.toJson(result, resBody);
         resBody.close();
     }
-
-    /*
-        The readString method shows how to read a String from an InputStream.
-    */
-    private String readString(InputStream is) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        InputStreamReader sr = new InputStreamReader(is);
-        char[] buf = new char[1024];
-        int len;
-        while ((len = sr.read(buf)) > 0) {
-            sb.append(buf, 0, len);
-        }
-        return sb.toString();
-    }
-
 }

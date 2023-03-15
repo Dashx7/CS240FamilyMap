@@ -41,6 +41,7 @@ public class EventService {
 
 
         } catch (DataAccessException e) {
+            //e.printStackTrace();
             myResult.setSuccess(false);
             myResult.setMessage("Error, failed to connect because" + e.toString());
         }
@@ -67,6 +68,7 @@ public class EventService {
                 throw new DataAccessException("Error, event not associated with your authtoken username");
             }
         } catch (DataAccessException e) {
+            //e.printStackTrace();
             myResult.setSuccess(false);
             myResult.setMessage("Error, failed to connect because" + e.toString() + ", " + e.returnMessage());
         }

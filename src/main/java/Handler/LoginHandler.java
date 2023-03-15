@@ -11,7 +11,7 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.*;
 
 
-public class LoginHandler implements HttpHandler {
+public class LoginHandler extends Handler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
 
@@ -61,19 +61,5 @@ public class LoginHandler implements HttpHandler {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-    }
-
-    /*
-        The readString method shows how to read a String from an InputStream.
-    */
-    private String readString(InputStream is) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        InputStreamReader sr = new InputStreamReader(is);
-        char[] buf = new char[1024];
-        int len;
-        while ((len = sr.read(buf)) > 0) {
-            sb.append(buf, 0, len);
-        }
-        return sb.toString();
     }
 }

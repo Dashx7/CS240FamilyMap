@@ -11,7 +11,7 @@ import com.sun.net.httpserver.*;
  * Default handler. If you load the page or get a request that doesn't better
  * match something else it will go to this one
  */
-public class FileHandler implements HttpHandler {
+public class FileHandler extends Handler implements HttpHandler {
 
     // Handles HTTP requests containing the "/routes/claim" URL path.
     // The "exchange" parameter is an HttpExchange object, which is
@@ -86,19 +86,5 @@ public class FileHandler implements HttpHandler {
             // Display/log the stack trace
             e.printStackTrace();
         }
-    }
-
-    /*
-        The readString method shows how to read a String from an InputStream.
-    */
-    private String readString(InputStream is) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        InputStreamReader sr = new InputStreamReader(is);
-        char[] buf = new char[1024];
-        int len;
-        while ((len = sr.read(buf)) > 0) {
-            sb.append(buf, 0, len);
-        }
-        return sb.toString();
     }
 }

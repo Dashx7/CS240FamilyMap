@@ -26,15 +26,15 @@ public class LoginService {
      */
     public LoginService(LoginRequest myRequest) throws DataAccessException {
         try {
+            this.myRequest = myRequest;
+
             //Opening the database and the Dao connections
             myDatabase = new Database();
             myDatabase.openConnection();
-            Connection myConnection = myDatabase.getConnection();
-            myUserDao = new UserDao(myConnection);
-            myAuthTokenDao = new AuthTokenDao(myConnection);
-
-            this.myRequest = myRequest;
+            myUserDao = new UserDao(myDatabase.getConnection());
+            myAuthTokenDao = new AuthTokenDao(myDatabase.getConnection());
             User myUser = myUserDao.find(myRequest.getUsername());
+
             if (myUser == null) {
                 throw new DataAccessException("Username does not exist");
             }

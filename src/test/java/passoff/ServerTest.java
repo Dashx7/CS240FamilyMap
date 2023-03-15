@@ -468,7 +468,7 @@ public class ServerTest {
      */
     @Test
     @DisplayName("Event Wrong User Test")
-    public void testWrongUserEvent(TestInfo testInfo) {
+    public void testWrongUserEvent(TestInfo testInfo) { //Works double
         printTestName(testInfo);
         //We are calling the load api using the data in "/passoffFiles/LoadData.json" as the request
         load();
@@ -517,7 +517,7 @@ public class ServerTest {
      */
     @Test
     @DisplayName("Events Bad Auth Token Test")
-    public void testBadAuthTokenEvents(TestInfo testInfo) {
+    public void testBadAuthTokenEvents(TestInfo testInfo) { //double
         printTestName(testInfo);
         try {
             //We are calling the register api for a user named sheila
@@ -540,7 +540,7 @@ public class ServerTest {
      */
     @Test
     @DisplayName("Valid Fill Relationships Test")
-    public void testValidFillRelationships(TestInfo testInfo) {
+    public void testValidFillRelationships(TestInfo testInfo) { //works double
         printTestName(testInfo);
         try {
             //We are calling the register api for a user named sheila
@@ -565,7 +565,7 @@ public class ServerTest {
      */
     @Test
     @DisplayName("Realistic Fill Birth Test")
-    public void testRealisticBirthEvents(TestInfo testInfo) {
+    public void testRealisticBirthEvents(TestInfo testInfo) { //works double
         printTestName(testInfo);
         try {
             //We are calling the register api for a user named sheila
@@ -933,8 +933,7 @@ public class ServerTest {
         //You may need to follow the steps under the heading "Setting up for the Persistence Test" in the "How To Get Started"
         //tutorial, linked in canvas, in order to get this to work properly. The "How to Get Started" tutorial can be found
         //inside the Family Map Server Program assignment listed on the Assignments tab on canvas.
-        //TODO ADD BACK
-        //scanner.nextLine();
+        scanner.nextLine();
         try {
             //We are creating a JsonReader from the LoadData.json file
             JsonReader jsonReader = new JsonReader(new FileReader("passoffFiles/LoadData.json"));

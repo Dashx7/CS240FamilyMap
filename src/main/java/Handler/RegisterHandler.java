@@ -11,7 +11,7 @@ import Result.*;
 import Service.RegisterService;
 
 
-public class RegisterHandler implements HttpHandler {
+public class RegisterHandler extends Handler implements HttpHandler {
 
     RegisterService myService;
 
@@ -58,17 +58,4 @@ public class RegisterHandler implements HttpHandler {
         }
     }
 
-    /*
-        The readString method shows how to read a String from an InputStream.
-    */
-    private String readString(InputStream is) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        InputStreamReader sr = new InputStreamReader(is);
-        char[] buf = new char[1024];
-        int len;
-        while ((len = sr.read(buf)) > 0) {
-            sb.append(buf, 0, len);
-        }
-        return sb.toString();
-    }
 }

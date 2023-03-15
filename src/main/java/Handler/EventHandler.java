@@ -2,20 +2,17 @@ package Handler;
 
 import java.io.*;
 import java.net.*;
-import java.sql.Connection;
 
 import DataAccess.AuthTokenDao;
 import DataAccess.DataAccessException;
 import DataAccess.Database;
 import Model.AuthToken;
-import Model.Event;
 import Result.EventResult;
 import Service.EventService;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.*;
 
-public class EventHandler implements HttpHandler {
-    String eventID = null;
+public class EventHandler extends Handler implements HttpHandler {
     EventService myEventService;
     EventResult result;
 
@@ -25,7 +22,7 @@ public class EventHandler implements HttpHandler {
      */
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        myEventService = new EventService();
+        String eventID = null;        myEventService = new EventService();
         result = new EventResult();
 
         String httpURI = exchange.getRequestURI().toString();
@@ -47,10 +44,9 @@ public class EventHandler implements HttpHandler {
                     //Opening the database
                     Database myDatabase = new Database();
                     myDatabase.openConnection();
-                    Connection myConnection = myDatabase.getConnection();
 
                     //Make sure authtoken is valid
-                    AuthTokenDao myAuthTokenDao = new AuthTokenDao(myConnection);
+                    AuthTokenDao myAuthTokenDao = new AuthTokenDao(myDatabase.getConnection());
                     AuthToken myAuthtoken = myAuthTokenDao.find(authToken, "authtoken");
                     myDatabase.closeConnection(false);
 
@@ -79,11 +75,15 @@ public class EventHandler implements HttpHandler {
                         Gson gson = new Gson();
                         gson.toJson(result, resBody);
                         resBody.close();
+                        //TEST
+                        myDatabase.openConnection();
+                        myDatabase.closeConnection(false);
                     } else {
                         throw new DataAccessException("Error: Did not have a valid Authtoken");
                     }
 
                 } catch (DataAccessException e) {
+                    e.printStackTrace(); //Not actually a problem
                     result.setMessage("Error: " + e.toString() + ", " + e.returnMessage());
                     result.setSuccess(false);
                     exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST, 0);
@@ -94,20 +94,5 @@ public class EventHandler implements HttpHandler {
                }
             }
         }
-    }
-
-
-    /*
-        The readString method shows how to read a String from an InputStream.
-    */
-    private String readString(InputStream is) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        InputStreamReader sr = new InputStreamReader(is);
-        char[] buf = new char[1024];
-        int len;
-        while ((len = sr.read(buf)) > 0) {
-            sb.append(buf, 0, len);
-        }
-        return sb.toString();
     }
 }

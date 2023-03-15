@@ -1,10 +1,8 @@
 package Handler;
 
 import java.io.*;
-import java.lang.reflect.Type;
 import java.net.*;
 
-import DataAccess.DataAccessException;
 import Result.LoadResult;
 import Service.ClearService;
 import Service.LoadService;
@@ -12,16 +10,13 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.*;
 import Request.LoadRequest;
 
-public class LoadHandler implements HttpHandler {
+public class LoadHandler extends Handler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException{
-        boolean success = false;
 
         try {
             //It's a post request
-            if (exchange.getRequestMethod().toLowerCase().equals("post")) {
-
-                // Extract the JSON string from the HTTP request body
+            if (exchange.getRequestMethod().equalsIgnoreCase("post")) {
 
                 // Get the request body input stream
                 InputStream reqBody = exchange.getRequestBody();
@@ -33,7 +28,7 @@ public class LoadHandler implements HttpHandler {
                 System.out.println(reqData);
 
                 Gson gson = new Gson();
-                //Clearing the database first, I think it uses the service
+                //Clearing the database first
                 ClearService myClear = new ClearService();
                 //Create the request from Json
                 LoadRequest request = (LoadRequest) gson.fromJson(reqData, LoadRequest.class);
@@ -56,19 +51,5 @@ public class LoadHandler implements HttpHandler {
             exchange.getResponseBody().close();
             e.printStackTrace();
         }
-    }
-
-    /*
-        The readString method shows how to read a String from an InputStream.
-    */
-    private String readString(InputStream is) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        InputStreamReader sr = new InputStreamReader(is);
-        char[] buf = new char[1024];
-        int len;
-        while ((len = sr.read(buf)) > 0) {
-            sb.append(buf, 0, len);
-        }
-        return sb.toString();
     }
 }

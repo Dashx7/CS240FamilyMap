@@ -27,17 +27,16 @@ public class LoadService {
      */
     public LoadService(LoadRequest request){
         try {
-            //Opening the database and the Dao connections
-            myDatabase = new Database();
-            myDatabase.openConnection();
-            Connection myConnection = myDatabase.getConnection();
-            myEventDao = new EventDao(myConnection);
-            myPersonDao = new PersonDao(myConnection);
-            myUserDao = new UserDao(myConnection);
-
             User[] users = request.getUsers();
             Person[] persons = request.getPersons();
             Event[] eventList = request.getEvents();
+
+            //Opening the database and the Dao connections
+            myDatabase = new Database();
+            myDatabase.openConnection();
+            myEventDao = new EventDao(myDatabase.getConnection());
+            myPersonDao = new PersonDao(myDatabase.getConnection());
+            myUserDao = new UserDao(myDatabase.getConnection());
 
             for (User theUser : users) {
                 myUserDao.insert(theUser);
