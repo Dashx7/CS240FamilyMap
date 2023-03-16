@@ -35,6 +35,7 @@ public class EventServiceTest {
 
     @Test
     public void EventPositive() {
+        //Load in something and then make sure finding it works
         Gson gson = new Gson();
         loadData newLoad = new loadData();
         LoadRequest request = (LoadRequest) gson.fromJson(newLoad.getLoad(), LoadRequest.class);
@@ -45,6 +46,8 @@ public class EventServiceTest {
         EventService myEventService = new EventService();
         myEventService.EventServiceSingular("aaronstarky", "aaronBirthID");
         assertTrue(myEventService.getMyResult().isSuccess());
+        //myEventService.EventServiceAll();
+        //assertTrue(myEventService.getMyResult().isSuccess());
     }
 
     @Test
@@ -59,5 +62,10 @@ public class EventServiceTest {
         EventService myEventService = new EventService();
         myEventService.EventServiceSingular("aaronstarky", "aaronDoesACoolFlip");
         assertFalse(myEventService.getMyResult().isSuccess());
+
+        ClearService clear = new ClearService();
+        myEventService.EventServiceSingular("aaronstarky", "aaronBirthID");
+        assertFalse(myEventService.getMyResult().isSuccess());
+
     }
 }

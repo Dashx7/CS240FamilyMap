@@ -3,7 +3,6 @@ package Handler;
 import java.io.*;
 import java.net.*;
 
-import DataAccess.DataAccessException;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.*;
 import Request.*;

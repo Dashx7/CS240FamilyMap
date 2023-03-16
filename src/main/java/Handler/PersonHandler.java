@@ -2,7 +2,6 @@ package Handler;
 
 import java.io.*;
 import java.net.*;
-import java.sql.Connection;
 
 import DataAccess.AuthTokenDao;
 import DataAccess.DataAccessException;
@@ -97,14 +96,6 @@ public class PersonHandler extends Handler implements HttpHandler {
             gson.toJson(result, resBody);
             resBody.close();
         }
-    }
-
-    private void handleWithID(HttpExchange exchange, AuthToken myAuthtoken) throws DataAccessException, IOException {
-
-    }
-
-    private static void handleWithoutID(HttpExchange exchange, AuthToken myAuthtoken) throws DataAccessException, IOException {
-
     }
 
     private static void sendSuccessResponse(HttpExchange exchange, PersonResult result) throws IOException {

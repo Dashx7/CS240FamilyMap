@@ -32,6 +32,7 @@ public class ClearServiceTest {
 
     @Test
     public void clearNegative(){
+        //Idk, kinda hard to mess up a clear
         ClearService myClearService = new ClearService();
         assertNotNull(myClearService.getMyResults());
 

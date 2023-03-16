@@ -55,7 +55,7 @@ public class RegisterService {
             myAuthTokenDao.insert(toInsert);
             myDatabase.closeConnection(true);
 
-            //myUserDao.ins
+            //Fill it after registering
             FillService myFillService = new FillService(newUser.getUsername(), 4);
 
 

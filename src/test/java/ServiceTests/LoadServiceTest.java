@@ -30,6 +30,7 @@ public class LoadServiceTest {
 
     @Test
     public void loadPositive() {
+        //Make sure it loads something
         Gson gson = new Gson();
         loadData newLoad = new loadData();
         LoadRequest request = (LoadRequest) gson.fromJson(newLoad.getLoad(), LoadRequest.class);
@@ -46,6 +47,16 @@ public class LoadServiceTest {
         LoadService service = new LoadService(request);
         LoadResult result = service.getMyResult();
         assertFalse(result.getMessage().contains("Error"));
+    }
+    @Test
+    public void loadNegative2(){
+        Gson gson = new Gson();
+        loadData newLoad = new loadData();
+        LoadRequest request = (LoadRequest) gson.fromJson(newLoad.getLoadBad(), LoadRequest.class);
+        LoadService service = new LoadService(request);
+        LoadResult result = service.getMyResult();
+        assertTrue(result.getMessage().contains("Error"));
+        assertFalse(result.isSuccess());
     }
 }
 

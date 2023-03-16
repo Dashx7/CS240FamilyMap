@@ -56,16 +56,31 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void personNegative() {
-        Gson gson = new Gson();
+    public void personNegative() {Gson gson = new Gson();
         loadData newLoad = new loadData();
         LoadRequest request = (LoadRequest) gson.fromJson(newLoad.getLoad(), LoadRequest.class);
         LoadService service = new LoadService(request);
         LoadResult result = service.getMyResult();
         assertTrue(result.isSuccess());
 
-        EventService myEventService = new EventService();
-        myEventService.EventServiceSingular("aaronstarky", "aaronDoesACoolFlip");
-        assertFalse(myEventService.getMyResult().isSuccess());
+        loadData newData = new loadData();
+        RegisterRequest myRegisterRequest = gson.fromJson(newData.getRegister(),RegisterRequest.class);
+        RegisterService newRegisterService = new RegisterService(myRegisterRequest);
+        AuthToken token = new AuthToken();
+        token.setAuthToken(newRegisterService.getMyResult().getAuthtoken());
+        token.setUserName(myRegisterRequest.getUsername());
+        try {
+            token.setUserName("NoUserName");
+            PersonService myPersonService = new PersonService(token);
+            assertFalse(myPersonService.getResult().isSuccess());
+        } catch (DataAccessException e) {
+        }
+        try {
+            token.setAuthToken("");
+            PersonService myPersonService = new PersonService(token);
+            assertFalse(myPersonService.getResult().isSuccess());
+        } catch (DataAccessException e) {
+        }
     }
+
 }

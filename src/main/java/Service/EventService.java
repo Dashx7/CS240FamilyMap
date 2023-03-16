@@ -3,25 +3,18 @@ package Service;
 import DataAccess.*;
 import Model.AuthToken;
 import Model.Event;
-import Model.Person;
-import Request.EventRequest;
 import Result.EventResult;
 
-import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.List;
-//import Request.PersonRequest;
-
 
 /**
- * looking up a Event service
+ * looking up an Event service
  */
 public class EventService {
     /**
      * The wonderful default constructor
      */
     Database myDatabase= new Database();
-    Event singularEvent = new Event();
     ArrayList<Event> listOfEvents = new ArrayList<>();
     EventResult myResult = new EventResult();
 
@@ -56,8 +49,6 @@ public class EventService {
             Event theEvent = myEventDao.find(EventID, "eventID");
             myDatabase.closeConnection(true);
 
-            //String a1 = theEvent.getAssociatedUsername().toString().toLowerCase();
-            //String userName = username.toString().toLowerCase();
             if(theEvent==null){
                 throw new DataAccessException("No event with this eventID");
             }
@@ -74,11 +65,7 @@ public class EventService {
         }
     }
 
-    //Getter Setter
-
-    public Event[] getListOfEventsFinal() {
-        return (Event[]) listOfEvents.toArray();
-    }
+    //Getter Setters
 
     public EventResult getMyResult() {
         return myResult;

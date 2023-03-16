@@ -106,11 +106,10 @@ public class FillService {
     public void generateTree(int generations, Person child, String childBirthID, User theUser) throws DataAccessException {
         Random myRand = new Random();
         int alterAmount;
-        int childBirth = myEventDao.find(childBirthID).getYear();;
+        int childBirth = myEventDao.find(childBirthID).getYear();
         if (generations > 0) {
             totalEvents +=6;
             totalPeople+=2;
-            String eventID;
 
             //Generate mother
             Person mother = generatePerson("f");
@@ -147,7 +146,6 @@ public class FillService {
             alterAmount = (positive%(MAXMARRIAGEAGE-MINMARRIAGEAGE))+MINMARRIAGEAGE; //13-50 alter
             int marriageYear = childBirth+alterAmount;
 
-            String MarriageEventID = CreateEvent("marriage", father.getPersonID(),marriageYear,myLocation);
             CreateEvent("marriage", father.getPersonID(),marriageYear ,myLocation);
             CreateEvent("marriage", mother.getPersonID(),marriageYear ,myLocation);
 
@@ -192,6 +190,8 @@ public class FillService {
         }
         return myPerson;
     }
+
+    //Create event for randomized locations
     private String CreateEvent(String type, String ID, int date) throws DataAccessException {
         Random myRandom = new Random();
         int positive = Math.abs(myRandom.nextInt());
@@ -206,22 +206,21 @@ public class FillService {
         myEventDao.insert(event);
         return event.getEventID();
     }
-    private String CreateEvent(String type, String ID, int date, Location myLocation) throws DataAccessException {
+    //Create event for fixed locations
+    private void CreateEvent(String type, String ID, int date, Location myLocation) throws DataAccessException {
         String eventID = UUID.randomUUID().toString().substring(0,8);
 
         Event event = new Event(eventID,theUser.getUsername(), ID,
                 myLocation.getLatitude(),myLocation.getLongitude(),
                 myLocation.getCountry(),myLocation.getCity(),type, date);
         myEventDao.insert(event);
-        return event.getEventID();
     }
 
     //Turing a filepath into a object
     private Object make(String filePath, Class theClass) throws FileNotFoundException {
         File file = new File(filePath);
         FileReader myFileReader = new FileReader(file);
-        Object myO = gson.fromJson(myFileReader,theClass);
-        return myO;
+        return gson.fromJson(myFileReader,theClass);
     }
     //Initializing all the Json file I need
     private void intilizeJson() {

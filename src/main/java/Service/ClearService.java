@@ -1,8 +1,5 @@
 package Service;
 
-import Model.AuthToken;
-import Model.Person;
-import Model.User;
 import Result.ClearResult;
 import DataAccess.*;
 
@@ -15,17 +12,18 @@ import java.sql.Connection;
 //They are pretty much a wrapper class to the DAO allowing you to do requests and get results
 public class ClearService {
     private ClearResult myResults = new ClearResult();
-    private AuthTokenDao myAuthTokenDao;
-    private EventDao myEventDao;
-    private PersonDao myPersonDao;
-    private UserDao myUserDao;
+
 
     /**
      * The wonderful default constructor
      * All the services need a Dao to manipulate the data that they use
      */
     public ClearService(){
-        Database myDatabase = new Database();;
+        AuthTokenDao myAuthTokenDao;
+        EventDao myEventDao;
+        PersonDao myPersonDao;
+        UserDao myUserDao;
+        Database myDatabase = new Database();
         try{
             //Opening the database and the Dao connections
             myDatabase.openConnection();

@@ -36,6 +36,8 @@ package ServiceTests;
 
             FillService myFillService = new FillService("aaronstarky",4);
             assertTrue(myFillService.getMyResults().isSuccess());
+            myFillService = new FillService("aaronstarky",1);
+            assertTrue(myFillService.getMyResults().isSuccess());
 
         }
 
@@ -48,6 +50,7 @@ package ServiceTests;
             LoadResult result = service.getMyResult();
             assertTrue(result.isSuccess());
 
+            //Can't fill in something not there
             FillService myFillService = new FillService("aaronstarkyFAILED",4);
             assertFalse(myFillService.getMyResults().isSuccess());
             assertTrue(myFillService.getMyResults().getMessage().contains("Error"));

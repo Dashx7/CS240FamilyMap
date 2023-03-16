@@ -5,15 +5,10 @@ import Request.LoadRequest;
 import Result.LoadResult;
 import Model.*;
 
-import java.sql.Connection;
-
 /**
  * Load service
  */
 public class LoadService {
-    private PersonDao myPersonDao;
-    private EventDao myEventDao;
-    private UserDao myUserDao;
     private Database myDatabase;
     LoadResult myResult = new LoadResult();
     /**
@@ -26,6 +21,9 @@ public class LoadService {
      * with request body, automatically loads it
      */
     public LoadService(LoadRequest request){
+        PersonDao myPersonDao;
+        EventDao myEventDao;
+        UserDao myUserDao;
         try {
             User[] users = request.getUsers();
             Person[] persons = request.getPersons();

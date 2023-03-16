@@ -6,7 +6,6 @@ import Model.User;
 import Request.LoginRequest;
 import Result.LoginResult;
 
-import java.sql.Connection;
 import java.util.UUID;
 
 /**
@@ -14,8 +13,6 @@ import java.util.UUID;
  */
 public class LoginService {
     private AuthToken userToken;
-    private UserDao myUserDao;
-    private AuthTokenDao myAuthTokenDao;
     Database myDatabase;
 
     LoginRequest myRequest;
@@ -31,14 +28,14 @@ public class LoginService {
             //Opening the database and the Dao connections
             myDatabase = new Database();
             myDatabase.openConnection();
-            myUserDao = new UserDao(myDatabase.getConnection());
-            myAuthTokenDao = new AuthTokenDao(myDatabase.getConnection());
+            UserDao myUserDao = new UserDao(myDatabase.getConnection());
+            AuthTokenDao myAuthTokenDao = new AuthTokenDao(myDatabase.getConnection());
             User myUser = myUserDao.find(myRequest.getUsername());
 
             if (myUser == null) {
                 throw new DataAccessException("Username does not exist");
             }
-            else if (myUser.getPassword() == myRequest.getPassword() || myUser.getPassword().compareTo(myRequest.getPassword()) == 0) {
+            else if (myUser.getPassword().compareTo(myRequest.getPassword()) == 0) {
                 if(myUser.getUsername().compareTo(myRequest.getUsername())==0){
                     userToken = myAuthTokenDao.find(myRequest.getUsername(), "username");
 
@@ -66,6 +63,8 @@ public class LoginService {
             myDatabase.closeConnection(false);
         }
     }
+
+    //Getter setters
 
     public AuthToken getUserToken() {
         return userToken;

@@ -41,6 +41,15 @@ import static org.junit.jupiter.api.Assertions.*;
             RegisterService newRegisterService = new RegisterService(myRegisterRequest);
             assertFalse(newRegisterService.getMyResult().isSuccess());
         }
+        @Test
+        public void registerNegative2() {
+            loadData newData = new loadData();
+            Gson gson = new Gson();
+            RegisterRequest myRegisterRequest = gson.fromJson(newData.getRegister(),RegisterRequest.class);
+            myRegisterRequest.setGender("Not Valid");
+            RegisterService newRegisterService = new RegisterService(myRegisterRequest);
+            assertFalse(newRegisterService.getMyResult().isSuccess());
+        }
     }
 
 

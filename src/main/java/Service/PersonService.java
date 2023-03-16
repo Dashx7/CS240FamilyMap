@@ -1,19 +1,11 @@
 package Service;
 
 import DataAccess.*;
-//import DataAccess.EventDao;
 import Model.AuthToken;
-import Model.Event;
 import Model.Person;
 import Result.PersonResult;
-//import Request.LoginRequest;
-//import Request.PersonRequest;
-//import Result.LoginResult;
-//import Result.PersonResult;
 
-import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * looking up a Person service
@@ -24,7 +16,6 @@ public class PersonService {
      */
     Database myDatabase = new Database();
     private PersonDao myPersonDao;
-    private AuthTokenDao myAuthtokenDao;
     AuthToken myAuthToken;
     Person singularPerson;
     ArrayList<Person> listOfPeople = new ArrayList<>();
@@ -40,7 +31,7 @@ public class PersonService {
             //Opening the database and the Dao connections
             myDatabase.openConnection();
             myPersonDao = new PersonDao(myDatabase.getConnection());
-            myAuthtokenDao = new AuthTokenDao(myDatabase.getConnection());
+            AuthTokenDao myAuthtokenDao = new AuthTokenDao(myDatabase.getConnection());
 
             //Create the person from finding it in the database using its name
             singularPerson = myPersonDao.find(myAuthToken.getUserName(),"");
@@ -49,10 +40,8 @@ public class PersonService {
             if (singularPerson != null) {
                 myDatabase.openConnection();
                 myPersonDao = new PersonDao(myDatabase.getConnection());
-                listOfPeople = myPersonDao.findAll(myAuthToken.getUserName()); //FIXME ?
+                listOfPeople = myPersonDao.findAll(myAuthToken.getUserName());
                 myDatabase.closeConnection(true);
-//                listOfPeople.add(singularPerson); //Add in the base person
-//                generateAllRelatives(singularPerson);
                 result.setSuccess(true);
                 result.setData(listOfPeople);
 
@@ -125,6 +114,8 @@ public class PersonService {
 //            generateAllRelatives(mom);
 //        }
 //    }
+
+    //Getter setters
 
     public Person getSingularPerson() {
         return singularPerson;
